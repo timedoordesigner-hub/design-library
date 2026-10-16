@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { enter } from "@/components/LoginGate";
 
 import Image from "next/image";
 
@@ -30,6 +31,7 @@ export default function LoginPage() {
       setBusy(false);
       return setError(failure);
     }
+    enter();
     router.push("/library");
   };
 
@@ -48,7 +50,7 @@ export default function LoginPage() {
           <h1 id="login-title">Halo, selamat datang!</h1>
           <p className="login-sub">Cari dan lihat semua file design Timedor Academy.</p>
 
-          <Link href="/" className="login-cta">Lanjut sebagai viewer</Link>
+          <Link href="/" className="login-cta" onClick={enter}>Lanjut sebagai viewer</Link>
 
           {adminOpen ? (
             <form className="login-admin" onSubmit={submit} noValidate>
