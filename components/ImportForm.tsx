@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useDesigns } from "./DesignsProvider";
 import { useToast } from "./Toast";
 import { MAX_FILE_BYTES, MAX_FILES, TEMPLATE, parseDesignMd, planImport, type ParsedMd, type PlanRow } from "@/lib/importMd";
+import { MAX_JSON_BYTES, parseSpreadsheetJson } from "@/lib/importSpreadsheet";
 
 const statusLabel = { new: "Baru", update: "Update", skip: "Dilewati", error: "Error" } as const;
 
@@ -13,6 +14,7 @@ export function ImportForm() {
   const { designs, loading, importMany } = useDesigns();
   const { showToast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
+  const jsonRef = useRef<HTMLInputElement>(null);
   const [rows, setRows] = useState<ParsedMd[]>([]);
   const [overwrite, setOverwrite] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -41,6 +43,13 @@ export function ImportForm() {
     setRows(parsed);
   };
 
+  const readJson = async (file: File | undefined) => {
+    if (!file) return;
+    if (file.size > MAX_JSON_BYTES) return showToast(`Ukuran JSON maksimal ${MAX_JSON_BYTES / 1024 / 1024} MB.`, "error");
+    try { setRows(parseSpreadsheetJson(await file.text(), file.name)); }
+    catch { showToast("File tidak bisa dibaca.", "error"); }
+  };
+
   const onDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setDragging(false);
@@ -64,7 +73,7 @@ export function ImportForm() {
       showToast(`${result.added} ditambahkan${result.updated ? `, ${result.updated} diperbarui` : ""}.`);
       router.push("/library");
     } catch {
-      showToast("Gagal menyimpan. Penyimpanan browser mungkin penuh.", "error");
+      showToast("Gagal menyimpan. Periksa koneksi atau login admin, lalu import ulang (aman diulang).", "error");
       setSaving(false);
     }
   };
@@ -75,7 +84,7 @@ export function ImportForm() {
     <main className="content-inner pb-16 pt-7">
       <p className="eyebrow">Admin · Import</p>
       <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">Import banyak data</h2>
-      <p className="mt-1 text-[13px] text-muted">Pilih banyak file Markdown dengan format front matter untuk menambahkan data sekaligus.</p>
+      <p className="mt-1 text-[13px] text-muted">Import banyak file Markdown atau satu JSON hasil Google Sheets untuk menambahkan data sekaligus.</p>
 
       <section className="form-card mt-6">
         <div className={`md-dropzone ${dragging ? "is-dragging" : ""}`} onDragOver={(event) => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={onDrop}>
@@ -88,6 +97,13 @@ export function ImportForm() {
           <p className="text-[11px] text-muted">Satu file = satu data. Maksimal 500 file, 256 KB per file.</p>
           <button type="button" className="control-button" onClick={downloadTemplate}>Unduh template</button>
         </div>
+      </section>
+
+      <section className="form-card mt-4">
+        <strong>Import dari Google Sheets (JSON)</strong>
+        <p className="mt-1 text-[13px] text-muted">Satu file JSON hasil script <span className="mono">scripts/export-design-library.gs</span>. Gambar Drive harus dibagikan &quot;Anyone with the link&quot;.</p>
+        <button type="button" className="control-button mt-3" onClick={() => jsonRef.current?.click()}>Pilih file JSON</button>
+        <input ref={jsonRef} className="sr-only" type="file" accept=".json,application/json" onChange={(event) => { void readJson(event.target.files?.[0]); event.target.value = ""; }} />
       </section>
 
       {rows.length > 0 && (

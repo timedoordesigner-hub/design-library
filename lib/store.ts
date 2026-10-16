@@ -71,11 +71,15 @@ export async function updateDesign(id: number, fields: DesignFields): Promise<De
 }
 
 // Satu statement = atomik. Konflik pada source_no -> update baris yang ada.
+// Dipecah per 100 baris (batas body request). Tiap chunk atomik; antar chunk tidak, tapi upsert aman diulang.
 export async function upsertDesigns(items: DesignFields[]): Promise<Design[]> {
-  if (!items.length) return [];
-  const { data, error } = await supabase().from("designs").upsert(items.map(toRow), { onConflict: "source_no" }).select();
-  if (error) throw error;
-  return (data as Row[]).map(fromRow);
+  const saved: Design[] = [];
+  for (let i = 0; i < items.length; i += 100) {
+    const { data, error } = await supabase().from("designs").upsert(items.slice(i, i + 100).map(toRow), { onConflict: "source_no" }).select();
+    if (error) throw error;
+    saved.push(...(data as Row[]).map(fromRow));
+  }
+  return saved;
 }
 
 export async function deleteDesign(id: number): Promise<void> {

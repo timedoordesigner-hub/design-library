@@ -1,4 +1,4 @@
-import { categoryGroups, categoryNames, mediaTypes } from "./taxonomy";
+import { categoryGroups, categoryNames, mediaTypes, splitCategories } from "./taxonomy";
 
 export type Design = {
   id: number;
@@ -32,7 +32,7 @@ function ordered(used: Set<string>, known: readonly string[]) {
 export function deriveOptions(items: Design[]) {
   const subs = categoryGroups.flatMap((group) => group.subcategories);
   return {
-    categories: ordered(new Set(items.map((d) => d.category)), categoryNames),
+    categories: ordered(new Set(items.flatMap((d) => splitCategories(d.category))), categoryNames),
     subCategories: ordered(new Set(items.map((d) => d.subCategory)), subs),
     tipes: ordered(new Set(items.map((d) => d.tipe)), mediaTypes),
   };

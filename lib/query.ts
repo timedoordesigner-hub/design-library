@@ -1,4 +1,5 @@
 import type { Design } from "./designs";
+import { splitCategories } from "./taxonomy";
 
 export type SortKey = "no" | "nama" | "category" | "tipe";
 export type View = "list" | "grid";
@@ -51,7 +52,7 @@ export function isActive(q: Query): boolean {
 export function apply(all: Design[], q: Query): Design[] {
   const needle = q.q.trim().toLowerCase();
   const filtered = all.filter((design) => {
-    if (q.cat.length && !q.cat.includes(design.category)) return false;
+    if (q.cat.length && !splitCategories(design.category).some((c) => q.cat.includes(c))) return false;
     if (q.sub.length && !q.sub.includes(design.subCategory)) return false;
     if (q.tipe.length && !q.tipe.includes(design.tipe)) return false;
     if (!needle) return true;

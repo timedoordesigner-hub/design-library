@@ -19,7 +19,7 @@ h: 9
 Catatan design di sini.
 `;
 
-export type ImportFields = Omit<Design, "id" | "image" | "w" | "h"> & { w?: number; h?: number };
+export type ImportFields = Omit<Design, "id" | "image" | "w" | "h"> & { w?: number; h?: number; image?: string };
 export type ParsedMd = { file: string; fields?: ImportFields; errors: string[]; warnings: string[] };
 export type PlanStatus = "new" | "update" | "skip" | "error";
 export type PlanRow = { file: string; status: PlanStatus; messages: string[]; fields?: ImportFields; design?: Design };
@@ -106,10 +106,10 @@ export function planImport(parsed: ParsedMd[], existing: Design[], overwrite: bo
 
     const old = bySource.get(fields.sourceNo);
     if (old && !overwrite) return { file, status: "skip", messages: ["Sudah ada di library, dilewati.", ...messages], fields };
-    const { w, h, ...rest } = fields;
+    const { w, h, image, ...rest } = fields;
     if (old) {
-      return { file, status: "update", messages, fields, design: { ...old, ...rest, preview: fields.preview || old.preview, w: w ?? old.w, h: h ?? old.h } };
+      return { file, status: "update", messages, fields, design: { ...old, ...rest, preview: fields.preview || old.preview, image: image || old.image, w: w ?? old.w, h: h ?? old.h } };
     }
-    return { file, status: "new", messages, fields, design: { ...rest, id: nextId++, w: w ?? 16, h: h ?? 9 } };
+    return { file, status: "new", messages, fields, design: { ...rest, ...(image && { image }), id: nextId++, w: w ?? 16, h: h ?? 9 } };
   });
 }

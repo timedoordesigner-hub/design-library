@@ -25,4 +25,6 @@ export const categoryTones: Record<string, { accent: string; soft: string; base:
 };
 
 export const fallbackTone = { accent: "#5b6270", soft: "#f0f2f8", base: "#e3e6ee" };
-export const toneOf = (category: string) => categoryTones[category] ?? fallbackTone;
+// Category bisa berisi beberapa nilai ("Marketing, Branch"); nada mengikuti yang pertama.
+export const splitCategories = (category: string) => category.split(",").map((c) => c.trim()).filter(Boolean);
+export const toneOf = (category: string) => categoryTones[splitCategories(category)[0] ?? ""] ?? fallbackTone;
