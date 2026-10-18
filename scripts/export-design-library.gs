@@ -1,47 +1,86 @@
 /**
  * Export sheet -> JSON untuk Admin > Import data.
- * Pakai: Extensions > Apps Script > tempel > pilih fungsi exportJson > Run > buka Executions log / file di Drive.
- * Header baris 1 harus: No | Nama File | Category | Tipe Media | Link File | Keyword | Preview | Note
- * Gambar: file Drive harus "Anyone with the link: Viewer".
+ * Pakai: tempel di file baru (mis. export.gs) > pilih fungsi exportJson > Run > buka Execution log.
+ * Header (di baris mana saja dalam 30 baris pertama): No | Nama File | Category | Tipe Media | Link File | Keyword | Preview | Note
+ * Tab dicari otomatis. Gambar: file Drive harus "Anyone with the link: Viewer".
  */
-const SHEET_NAME = ""; // kosong = sheet aktif
-const PREVIEW_FOLDER_ID = ""; // opsional: folder gambar; dipakai jika chip tidak memberi URL (dicocokkan lewat nama file)
+const EXPORT_SHEET_NAME = ""; // kosong = cari otomatis di semua tab
+const EXPORT_PREVIEW_FOLDER_ID = ""; // opsional: folder gambar; dipakai jika chip tidak memberi URL (dicocokkan lewat nama file)
+
+function exportFindHeader_(values) {
+  const norm = (s) => String(s).trim().toLowerCase();
+  for (let r = 0; r < Math.min(values.length, 30); r++) {
+    const head = values[r].map(norm);
+    if (head.indexOf("no") >= 0 && head.indexOf("nama file") >= 0) return { row: r, head };
+  }
+  return null;
+}
+
+// Smart chip Drive tidak terbaca getLinkUrl(); baca lewat Sheets API (Services > Sheets v4, sudah aktif). Hasil: {indeksBaris: url}
+function exportChipUrls_(ss, sheet, colIdx) {
+  const out = {};
+  if (colIdx < 0) return out;
+  try {
+    const res = Sheets.Spreadsheets.get(ss.getId(), {
+      ranges: ["'" + sheet.getName().replace(/'/g, "''") + "'"],
+      fields: "sheets(data(startRow,rowData(values(chipRuns))))",
+    });
+    const data = res.sheets[0].data[0];
+    const base = data.startRow || 0;
+    (data.rowData || []).forEach((row, r) => {
+      const cell = (row.values || [])[colIdx];
+      for (const run of (cell && cell.chipRuns) || []) {
+        const uri = run.chip && run.chip.richLinkProperties && run.chip.richLinkProperties.uri;
+        if (uri) { out[base + r] = uri; break; }
+      }
+    });
+  } catch (e) {
+    Logger.log("Gagal baca chip via Sheets API: %s", e);
+  }
+  return out;
+}
 
 function exportJson() {
-  const sheet = SHEET_NAME ? SpreadsheetApp.getActive().getSheetByName(SHEET_NAME) : SpreadsheetApp.getActiveSheet();
-  const range = sheet.getDataRange();
-  const values = range.getValues();
+  const ss = SpreadsheetApp.getActive();
+  const sheets = EXPORT_SHEET_NAME ? [ss.getSheetByName(EXPORT_SHEET_NAME)] : ss.getSheets();
+  let sheet = null, range, values, found;
+  for (const s of sheets) {
+    if (!s || s.getLastRow() < 2) continue;
+    range = s.getDataRange();
+    values = range.getValues();
+    found = exportFindHeader_(values);
+    if (found) { sheet = s; break; }
+  }
+  if (!sheet) throw new Error("Header 'No' + 'Nama File' tidak ditemukan di tab mana pun. Cek EXPORT_SHEET_NAME / nama header.");
+
   const rich = range.getRichTextValues();
-  const head = values[0].map((h) => String(h).trim().toLowerCase());
-  const col = (name) => head.indexOf(name);
+  const col = (name) => found.head.indexOf(name);
   const c = { no: col("no"), nama: col("nama file"), cat: col("category"), tipe: col("tipe media"), link: col("link file"), kw: col("keyword"), prev: col("preview"), note: col("note") };
-  if (c.no < 0 || c.nama < 0 || c.cat < 0 || c.tipe < 0) throw new Error("Header No / Nama File / Category / Tipe Media tidak ditemukan.");
+  if (c.cat < 0 || c.tipe < 0) throw new Error("Header Category / Tipe Media tidak ditemukan.");
+
+  const urlOf = (cell) => (cell ? cell.getLinkUrl() || cell.getRuns().map((r) => r.getLinkUrl()).find(Boolean) || "" : "");
+
+  const chips = exportChipUrls_(ss, sheet, c.prev);
 
   const byName = {};
-  if (PREVIEW_FOLDER_ID) {
-    const files = DriveApp.getFolderById(PREVIEW_FOLDER_ID).getFiles();
+  if (EXPORT_PREVIEW_FOLDER_ID) {
+    const files = DriveApp.getFolderById(EXPORT_PREVIEW_FOLDER_ID).getFiles();
     while (files.hasNext()) { const f = files.next(); byName[f.getName()] = f.getId(); }
   }
 
   const rows = [];
   let noImage = 0;
-  for (let i = 1; i < values.length; i++) {
+  for (let i = found.row + 1; i < values.length; i++) {
     const v = values[i];
-    if (!String(v[c.no]).trim() || !String(v[c.nama]).trim()) continue;
-    const richCell = c.prev >= 0 ? rich[i][c.prev] : null;
+    const no = Number(v[c.no]);
+    if (!(no > 0) || !String(v[c.nama]).trim()) continue;
     const label = c.prev >= 0 ? String(v[c.prev]).trim() : "";
-    let image = "";
-    if (richCell) {
-      const url = richCell.getLinkUrl() || (richCell.getRuns().map((r) => r.getLinkUrl()).find(Boolean) || "");
-      image = url; // importer mengubah URL Drive jadi thumbnail
-    }
+    let image = (c.prev >= 0 ? urlOf(rich[i][c.prev]) : "") || chips[i] || "";
     if (!image && label && byName[label]) image = byName[label];
     if (!image) noImage++;
-    // Link Figma: ambil URL dari hyperlink jika teks sel terpotong.
-    const linkRich = c.link >= 0 ? rich[i][c.link] : null;
-    const link = (linkRich && linkRich.getLinkUrl()) || (c.link >= 0 ? String(v[c.link]).trim() : "");
+    const link = c.link >= 0 ? urlOf(rich[i][c.link]) || String(v[c.link]).trim() : "";
     rows.push({
-      sourceNo: Number(v[c.no]),
+      sourceNo: no,
       nama: String(v[c.nama]).trim(),
       category: String(v[c.cat]).trim(),
       tipe: String(v[c.tipe]).trim(),
@@ -49,10 +88,10 @@ function exportJson() {
       keywords: c.kw >= 0 ? String(v[c.kw]).split(",").map((k) => k.trim()).filter(Boolean) : [],
       preview: label,
       note: c.note >= 0 ? String(v[c.note]).trim() : "",
-      image,
+      image, // importer mengubah URL Drive jadi thumbnail
     });
   }
 
   const file = DriveApp.createFile("design-library-export.json", JSON.stringify(rows, null, 1), MimeType.PLAIN_TEXT);
-  Logger.log("%s baris. Tanpa gambar: %s. File: %s", rows.length, noImage, file.getUrl());
+  Logger.log("Tab: %s. %s baris. Tanpa gambar: %s. File: %s", sheet.getName(), rows.length, noImage, file.getUrl());
 }
