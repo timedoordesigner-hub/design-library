@@ -1,0 +1,77 @@
+/* ═══════════════════════════════════════════════════════════
+   FORMS — tombol, input, popup info "i", form tambah/edit, dropzone, import
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Tombol ── */
+.control-button, .control-select { min-height: 36px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); color: var(--ink); padding: 0 12px; font-size: 12px; }
+.control-button:hover, .control-select:hover, .view-button:hover { border-color: var(--primary); color: var(--primary-dark); }
+.control-button.active, .view-button.active { border-color: var(--primary); background: var(--primary-soft); color: var(--primary-dark); }
+a.control-button { text-decoration: none; }
+
+.primary-button, .danger-button { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 4px; padding: 0 14px; color: #fff; font-size: 12px; font-weight: 500; text-decoration: none; }
+.primary-button { background: var(--primary); }
+.primary-button:hover:not(:disabled) { background: var(--primary-dark); }
+.danger-button { background: var(--danger); }
+.danger-button:hover { background: #9d1e22; }
+
+.icon-button { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); }
+.icon-edit { border-color: #cfe0fb; background: var(--info-soft); color: var(--info-dark); }
+.icon-delete { border-color: #f6cfd0; background: var(--danger-soft); color: var(--danger); }
+.icon-edit:hover { border-color: var(--info); background: #d3e5fd; }
+.icon-delete:hover { border-color: var(--danger); background: #fbd7d8; }
+
+/* ── Popup kecil "i" (dipakai di label No & Request Wave) ── */
+.info-tip { position: relative; display: inline-grid; place-items: center; color: var(--muted-soft); cursor: help; outline: 0; }
+.info-tip:hover, .info-tip:focus-visible { color: var(--info-dark); }
+.info-tip-popup { position: absolute; z-index: 30; bottom: calc(100% + 10px); left: -10px; width: 150px; border: 1px solid var(--line-strong); border-radius: 10px; background: #fff; padding: 8px 10px; color: var(--ink); font-size: 11px; font-weight: 400; line-height: 1.45; box-shadow: 0 8px 24px rgb(46 38 61 / 14%); pointer-events: none; opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity .15s, transform .15s, visibility .15s; }
+.info-tip-popup::after { content: ""; position: absolute; top: 100%; left: 14px; width: 8px; height: 8px; margin-top: -4px; border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); background: #fff; transform: rotate(45deg); }
+.info-tip:hover .info-tip-popup, .info-tip:focus-visible .info-tip-popup { opacity: 1; visibility: visible; transform: none; }
+/* Varian: popup menempel ke kanan (Request Wave di sidebar) */
+.info-tip-right .info-tip-popup { left: auto; right: -8px; width: 170px; }
+.info-tip-right .info-tip-popup::after { left: auto; right: 10px; }
+
+/* ── Field & input ── */
+.form-field { margin-bottom: 16px; }
+.label-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.label-row .form-label { margin: 0; }
+.form-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 500; }
+.form-input { width: 100%; height: 42px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); padding: 0 12px; color: var(--ink); font-size: 13px; }
+.form-input:focus { border-color: var(--primary); outline: 0; box-shadow: 0 0 0 3px var(--primary-soft); }
+.form-input::placeholder { color: #a3a5a9; }
+.form-input[aria-invalid="true"] { border-color: var(--danger); }
+.form-textarea { height: auto; padding: 10px 12px; resize: vertical; }
+.form-error { margin: 0 0 14px; color: var(--danger); font-size: 12px; }
+
+/* ── Layout form tambah/edit ── */
+.form-card { max-width: 1040px; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--surface); padding: 24px; }
+.form-grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 32px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-row-wide { grid-template-columns: 1fr 120px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; }
+
+/* ── Upload gambar ── */
+.dropzone { display: grid; min-height: 220px; place-items: center; overflow: hidden; border: 1.5px dashed var(--line-strong); border-radius: 5px; background: #fbfcfe; }
+.dropzone.is-dragging { border-color: var(--info); background: var(--info-soft); }
+.dropzone.has-error { border-color: var(--danger); }
+.dropzone-img { display: block; max-width: 100%; max-height: 320px; object-fit: contain; }
+.dropzone-empty { display: grid; justify-items: center; gap: 6px; padding: 24px; color: var(--muted); font-size: 11px; text-align: center; }
+.dropzone-empty strong { color: var(--ink); font-size: 13px; font-weight: 500; }
+.dropzone-icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--info-soft); color: var(--info-dark); }
+
+/* ── Halaman import ── */
+.import-summary { display: flex; flex-wrap: wrap; gap: 8px; }
+.import-count, .import-status { border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 500; }
+.import-status { display: inline-block; padding: 3px 8px; }
+.import-count-new, .import-status-new { background: var(--primary-soft); color: var(--primary-dark); }
+.import-count-update, .import-status-update { background: var(--info-soft); color: var(--info-dark); }
+.import-count-skip, .import-status-skip { background: var(--line); color: var(--muted); }
+.import-count-error, .import-status-error { background: var(--danger-soft); color: var(--danger); }
+.import-overwrite { display: flex; align-items: center; gap: 8px; margin: 14px 0; font-size: 12px; }
+.import-review { overflow-x: auto; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--surface); }
+.import-review-head, .import-review-row { display: grid; min-width: 720px; grid-template-columns: 84px minmax(120px, 1fr) 56px minmax(180px, 1.4fr) minmax(200px, 1.6fr); gap: 12px; align-items: start; padding: 10px 14px; font-size: 12px; }
+.import-review-head { border-bottom: 1px solid var(--line-strong); color: var(--muted); font-size: 11px; }
+.import-review-row + .import-review-row { border-top: 1px solid var(--line); }
+.import-review-row small { display: block; margin-top: 2px; color: var(--muted); }
+.import-file { overflow-wrap: anywhere; }
+.import-message { color: var(--muted); }
+.import-message-error { color: var(--danger); }

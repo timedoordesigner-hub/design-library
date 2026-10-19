@@ -1,0 +1,47 @@
+/* ═══════════════════════════════════════════════════════════
+   GALLERY — beranda cari design + grid Design Library + hover card
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Beranda ── */
+.search-home { display: grid; min-height: calc(100vh - 72px); width: min(100% - 48px, 760px); margin: 0 auto; align-content: center; justify-items: center; padding: 36px 0 80px; text-align: center; }
+.search-home-title { margin: 12px 0 0; font-size: clamp(28px, 4vw, 46px); font-weight: 600; letter-spacing: -.045em; line-height: 1.05; }
+.search-home-hint { margin: 18px auto 0; color: var(--muted); font-size: 13px; line-height: 1.7; white-space: nowrap; }
+.search-home-hint b { color: var(--ink); font-weight: 500; }
+.search-home-form { display: flex; width: min(100%, 620px); min-height: 64px; align-items: center; gap: 13px; margin-top: 32px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); padding: 8px 8px 8px 20px; color: var(--muted); box-shadow: 0 12px 32px rgb(46 38 61 / 7%); }
+.search-home-form:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft), 0 12px 32px rgb(46 38 61 / 7%); }
+.search-home-form input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 14px; }
+.search-home-form input::placeholder { color: #a3a5a9; }
+.search-home-form .primary-button { min-height: 46px; padding: 0 22px; }
+.search-home-link { display: inline-flex; align-items: center; gap: 9px; margin-top: 28px; color: var(--info-dark); font-size: 12px; text-decoration: none; }
+.search-home-link:hover { color: var(--info); text-decoration: underline; text-underline-offset: 4px; }
+.search-home-link span { margin-left: 4px; font-size: 16px; }
+
+/* ── Filter gallery ── */
+.gallery-sticky { position: sticky; top: 0; z-index: 20; margin-top: 12px; border-bottom: 1px solid var(--line); background: var(--canvas); padding: 12px 0; }
+.gallery-search { display: flex; width: min(100%, 620px); height: 44px; align-items: center; gap: 10px; margin-top: 0; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--surface); padding: 0 13px; color: var(--muted); }
+.gallery-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.gallery-search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 13px; }
+.gallery-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.gallery-chips .control-button { display: inline-flex; align-items: center; gap: 7px; }
+
+/* ── Grid & card ── */
+.gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.gallery-card { position: relative; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); }
+.gallery-card:focus-within, .gallery-card:hover { border-color: var(--primary); box-shadow: 0 8px 22px rgb(46 38 61 / 8%); }
+.gallery-media .thumb { border-radius: 0; }
+.gallery-foot { display: grid; gap: 5px; padding: 12px 14px; transition: opacity 120ms ease; }
+.gallery-foot strong { overflow: hidden; font-size: 13px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.gallery-foot span, .gallery-meta { color: var(--muted); font-size: 11px; }
+.gallery-card:hover .gallery-foot, .gallery-card:focus-within .gallery-foot { opacity: 0; }
+
+/* ── Hover info: gradient putih transparan, menyatu dengan gambar ── */
+.gallery-info { position: absolute; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; opacity: 0; transform: translateY(8px); background: linear-gradient(to top, rgb(255 255 255 / 99%) 0%, rgb(255 255 255 / 95%) 52%, rgb(255 255 255 / 18%) 86%, rgb(255 255 255 / 0%) 100%); padding: 56px 16px 14px; pointer-events: none; transition: opacity 160ms ease, transform 160ms ease; }
+.gallery-card:hover .gallery-info, .gallery-card:focus-within .gallery-info { opacity: 1; transform: none; pointer-events: auto; }
+.gallery-info h3 { display: -webkit-box; margin: 0; overflow: hidden; color: #171321; font-size: 15px; font-weight: 700; line-height: 1.25; line-clamp: 2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-shadow: 0 0 6px #fff, 0 0 12px #fff; }
+.gallery-info .gallery-meta { display: -webkit-box; margin: 4px 0 0; overflow: hidden; line-clamp: 2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #1f1a2b; font-size: 12px; font-weight: 600; text-shadow: 0 0 6px #fff, 0 0 12px #fff; }
+.gallery-info .tag { background: #eef1f7; color: #211b2d; font-weight: 500; }
+.gallery-info .tag-list { max-height: 20px; margin-top: 8px; }
+.gallery-info .gallery-note { display: none; }
+.gallery-note { display: -webkit-box; margin: 10px 0 0; overflow: hidden; color: var(--muted); font-size: 11px; line-height: 1.45; line-clamp: 3; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.gallery-actions { display: flex; gap: 7px; margin-top: 10px; }
+.gallery-actions .primary-button, .gallery-actions .control-button { min-height: 32px; }

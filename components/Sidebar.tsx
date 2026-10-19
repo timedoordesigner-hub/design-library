@@ -9,7 +9,14 @@ import { ExternalIcon, GridIcon, InfoIcon, LibraryIcon, LoginIcon, PlusIcon, Upl
 
 const logo = "/timedoor-logo.png";
 
-const navItems = [{ label: "Cari design", href: "/", icon: "library", tone: "green", admin: false }, { label: "Design Library", href: "/thumbnail", icon: "grid", tone: "blue", admin: false }, { label: "Library", href: "/library", icon: "library", tone: "green", admin: true }, { label: "Tambah file", href: "/tambah", icon: "plus", tone: "blue", admin: true }, { label: "Import data", href: "/impor", icon: "upload", tone: "orange", admin: true }];
+// Menu sidebar. Ubah label/urutan di sini. admin: true = hanya tampil setelah login admin.
+const navItems = [
+  { label: "Cari design", href: "/", icon: "library", tone: "green", admin: false },
+  { label: "Design Library", href: "/thumbnail", icon: "grid", tone: "blue", admin: false },
+  { label: "Library", href: "/library", icon: "library", tone: "green", admin: true },
+  { label: "Tambah file", href: "/tambah", icon: "plus", tone: "blue", admin: true },
+  { label: "Import data", href: "/impor", icon: "upload", tone: "orange", admin: true },
+];
 const icons = { library: <LibraryIcon />, grid: <GridIcon />, plus: <PlusIcon />, upload: <UploadIcon /> };
 
 type Props = { open?: boolean; onClose?: () => void };
