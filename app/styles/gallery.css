@@ -35,10 +35,10 @@
 .gallery-card:hover .gallery-foot, .gallery-card:focus-within .gallery-foot { opacity: 0; }
 
 /* ── Hover info: gradient putih transparan, menyatu dengan gambar ── */
-.gallery-info { position: absolute; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; opacity: 0; transform: translateY(8px); background: linear-gradient(to top, rgb(255 255 255 / 99%) 0%, rgb(255 255 255 / 95%) 52%, rgb(255 255 255 / 18%) 86%, rgb(255 255 255 / 0%) 100%); padding: 56px 16px 14px; pointer-events: none; transition: opacity 160ms ease, transform 160ms ease; }
+.gallery-info { position: absolute; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; opacity: 0; transform: translateY(8px); background: linear-gradient(to top, rgb(255 255 255 / 100%) 0%, rgb(255 255 255 / 98%) 60%, rgb(255 255 255 / 45%) 85%, rgb(255 255 255 / 0%) 100%); padding: 56px 16px 14px; pointer-events: none; transition: opacity 160ms ease, transform 160ms ease; }
 .gallery-card:hover .gallery-info, .gallery-card:focus-within .gallery-info { opacity: 1; transform: none; pointer-events: auto; }
-.gallery-info h3 { display: -webkit-box; margin: 0; overflow: hidden; color: #171321; font-size: 15px; font-weight: 700; line-height: 1.25; line-clamp: 2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-shadow: 0 0 6px #fff, 0 0 12px #fff; }
-.gallery-info .gallery-meta { display: -webkit-box; margin: 4px 0 0; overflow: hidden; line-clamp: 2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #1f1a2b; font-size: 12px; font-weight: 600; text-shadow: 0 0 6px #fff, 0 0 12px #fff; }
+.gallery-info h3 { display: -webkit-box; margin: 0; overflow: hidden; color: #171321; font-size: 15px; font-weight: 700; line-height: 1.25; line-clamp: 2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.gallery-info .gallery-meta { display: -webkit-box; margin: 4px 0 0; overflow: hidden; line-clamp: 2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #1f1a2b; font-size: 12px; font-weight: 600; }
 .gallery-info .tag { background: #eef1f7; color: #211b2d; font-weight: 500; }
 .gallery-info .tag-list { max-height: 20px; margin-top: 8px; }
 .gallery-info .gallery-note { display: none; }
