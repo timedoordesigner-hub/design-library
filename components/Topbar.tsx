@@ -15,7 +15,7 @@ export function Topbar({ onMenu }: Props) {
   const query = parseQuery(new URLSearchParams(searchParams.toString()));
   const searchRef = useRef<HTMLInputElement>(null);
   const { isAdmin } = useAuth();
-  const title = pathname === "/tambah" ? "Tambah file" : pathname === "/thumbnail" ? "Thumbnail" : pathname === "/library" ? "Library" : pathname.startsWith("/edit/") ? "Edit file" : "Cari design";
+  const title = pathname === "/tambah" ? "Tambah file" : pathname === "/thumbnail" ? "Design Library" : pathname === "/library" ? "Library" : pathname.startsWith("/edit/") ? "Edit file" : "Cari design";
 
   const updateSearch = (value: string) => {
     const next = { ...query, q: value };
@@ -39,7 +39,7 @@ export function Topbar({ onMenu }: Props) {
     <header className="topbar">
       <div className="topbar-left">
         <button className="menu-button" onClick={onMenu} aria-label="Buka menu">☰</button>
-        <div><p className="eyebrow">Workspace</p><h1 className="topbar-title">{title}</h1></div>
+        <h1 className="topbar-title">{title}</h1>
       </div>
       <div className="topbar-right">
         {pathname === "/library" && isAdmin && (

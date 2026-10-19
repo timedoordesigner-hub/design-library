@@ -5,11 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "./AuthProvider";
-import { ExternalIcon, GridIcon, LibraryIcon, LoginIcon, PlusIcon, UploadIcon } from "./Icons";
+import { ExternalIcon, GridIcon, InfoIcon, LibraryIcon, LoginIcon, PlusIcon, UploadIcon } from "./Icons";
 
 const logo = "/timedoor-logo.png";
 
-const navItems = [{ label: "Cari design", href: "/", icon: "library", tone: "green", admin: false }, { label: "Thumbnail", href: "/thumbnail", icon: "grid", tone: "blue", admin: false }, { label: "Library", href: "/library", icon: "library", tone: "green", admin: true }, { label: "Tambah file", href: "/tambah", icon: "plus", tone: "blue", admin: true }, { label: "Import data", href: "/impor", icon: "upload", tone: "orange", admin: true }];
+const navItems = [{ label: "Cari design", href: "/", icon: "library", tone: "green", admin: false }, { label: "Design Library", href: "/thumbnail", icon: "grid", tone: "blue", admin: false }, { label: "Library", href: "/library", icon: "library", tone: "green", admin: true }, { label: "Tambah file", href: "/tambah", icon: "plus", tone: "blue", admin: true }, { label: "Import data", href: "/impor", icon: "upload", tone: "orange", admin: true }];
 const icons = { library: <LibraryIcon />, grid: <GridIcon />, plus: <PlusIcon />, upload: <UploadIcon /> };
 
 type Props = { open?: boolean; onClose?: () => void };
@@ -41,12 +41,18 @@ export function Sidebar({ open = false, onClose }: Props) {
           })}
         </nav>
         <div className="sidebar-bottom">
-          <a href="https://requestwave.vercel.app" target="_blank" rel="noreferrer" className="nav-item mb-5" onClick={onClose}><span className="nav-icon nav-icon-blue" aria-hidden="true"><ExternalIcon /></span>Requestwave<span className="ml-auto" aria-hidden="true">↗</span></a>
+          <div className="mb-5 flex items-center gap-1">
+            <a href="https://requestwave.vercel.app" target="_blank" rel="noreferrer" className="nav-item min-w-0 flex-1" onClick={onClose}><span className="nav-icon nav-icon-blue" aria-hidden="true"><ExternalIcon /></span>Request wave<span className="ml-auto" aria-hidden="true">↗</span></a>
+            <span className="info-tip info-tip-right" tabIndex={0} role="button" aria-label="Apa itu Request wave?">
+              <InfoIcon />
+              <span className="info-tip-popup" role="tooltip">Request Wave: web untuk </span>
+            </span>
+          </div>
           <p className="sidebar-label">Account</p>
           {isAdmin ? (
             <button type="button" className="nav-item login-nav w-full text-left" onClick={() => { void signOut(); onClose?.(); }}><span className="nav-icon nav-icon-orange" aria-hidden="true"><LoginIcon /></span>Keluar</button>
           ) : (
-            <Link href="/login" className="nav-item login-nav" onClick={onClose}><span className="nav-icon nav-icon-orange" aria-hidden="true"><LoginIcon /></span>Masuk admin</Link>
+            <Link href="/login" className="nav-item login-nav" onClick={onClose}><span className="nav-icon nav-icon-orange" aria-hidden="true"><LoginIcon /></span>Login</Link>
           )}
           <p className="sidebar-version">Design Library · v0.1</p>
         </div>

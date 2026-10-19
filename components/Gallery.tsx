@@ -32,8 +32,7 @@ export function Gallery() {
 
   return (
     <main className="content-inner pb-16 pt-7">
-      <p className="eyebrow">Thumbnail</p>
-      <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">Semua design</h2>
+      <h2 className="text-xl font-semibold tracking-[-0.02em]">Semua design</h2>
       <p className="mt-1 text-[13px] text-muted">Arahkan kursor ke thumbnail untuk melihat judul, keyword, dan link Figma.</p>
 
       <div className="gallery-sticky">

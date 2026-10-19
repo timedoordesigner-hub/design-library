@@ -48,7 +48,7 @@ export function SearchHome() {
       </form>
       <Link href="/thumbnail" className="search-home-link">
         <GridIcon />
-        Lihat semua thumbnail{!loading && ` (${designs.length})`}
+        Lihat semua design{!loading && ` (${designs.length})`}
         <span aria-hidden="true">→</span>
       </Link>
     </main>
