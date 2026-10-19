@@ -45,7 +45,7 @@ export function Sidebar({ open = false, onClose }: Props) {
             <a href="https://requestwave.vercel.app" target="_blank" rel="noreferrer" className="nav-item min-w-0 flex-1" onClick={onClose}><span className="nav-icon nav-icon-blue" aria-hidden="true"><ExternalIcon /></span>Request wave<span className="ml-auto" aria-hidden="true">↗</span></a>
             <span className="info-tip info-tip-right" tabIndex={0} role="button" aria-label="Apa itu Request wave?">
               <InfoIcon />
-              <span className="info-tip-popup" role="tooltip">Request Wave: web untuk </span>
+              <span className="info-tip-popup" role="tooltip">Request Wave: web untuk melihat berapa request yang masuk </span>
             </span>
           </div>
           <p className="sidebar-label">Account</p>
