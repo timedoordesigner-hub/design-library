@@ -7,7 +7,7 @@ import { validUrl, type Design } from "@/lib/designs";
 import { removePreview, uploadPreview } from "@/lib/store";
 import { categoryGroups, categoryNames, mediaTypes } from "@/lib/taxonomy";
 import { useDesigns, type DesignFields } from "./DesignsProvider";
-import { ImageIcon } from "./Icons";
+import { ImageIcon, InfoIcon } from "./Icons";
 import { useToast } from "./Toast";
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -52,7 +52,7 @@ function FormBody({ existing }: { existing?: Design }) {
   const router = useRouter();
   const { designs, add, update } = useDesigns();
   const { showToast } = useToast();
-  const nextNo = useMemo(() => designs.reduce((max, d) => Math.max(max, d.sourceNo), 0) + 1, [designs]);
+  const nextNo = useMemo(() => designs.length + 1, [designs.length]);
 
   const [nama, setNama] = useState(existing?.nama ?? "");
   const [category, setCategory] = useState(existing?.category ?? "");
@@ -233,8 +233,16 @@ function FormBody({ existing }: { existing?: Design }) {
                 {err("link")}
               </div>
               <div className="form-field">
-                <label className="form-label" htmlFor="field-sourceNo">No</label>
-                <input id="field-sourceNo" className="form-input" inputMode="numeric" value={sourceNo} onChange={(e) => setSourceNo(e.target.value)} {...aria("sourceNo")} />
+                <div className="label-row">
+                  <label className="form-label" htmlFor="field-sourceNo">No</label>
+                  {!existing && (
+                    <span className="info-tip" tabIndex={0} role="button" aria-label="Informasi nomor otomatis">
+                      <InfoIcon />
+                      <span className="info-tip-popup" role="tooltip">Nomor otomatis sesuai jumlah design.</span>
+                    </span>
+                  )}
+                </div>
+                <input id="field-sourceNo" className="form-input" inputMode="numeric" value={sourceNo} readOnly={!existing} onChange={(e) => setSourceNo(e.target.value)} {...aria("sourceNo")} />
                 {err("sourceNo")}
               </div>
             </div>
