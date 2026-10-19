@@ -104,9 +104,9 @@ export function Library() {
               <option value="tipe">Urut: Media type</option>
             </select>
             <button className="control-button" onClick={() => update({ dir: query.dir === "asc" ? "desc" : "asc" })} aria-label={query.dir === "asc" ? "Urutan naik, klik untuk turun" : "Urutan turun, klik untuk naik"}>{query.dir === "asc" ? "A→Z" : "Z→A"}</button>
-            <div className="flex" role="group" aria-label="Tampilan">
-              <button className={`control-button view-button rounded-r-none ${query.view === "list" ? "active" : ""}`} onClick={() => update({ view: "list" })} aria-pressed={query.view === "list"}>Tabel</button>
-              <button className={`control-button view-button -ml-px rounded-l-none ${query.view === "grid" ? "active" : ""}`} onClick={() => update({ view: "grid" })} aria-pressed={query.view === "grid"}>Thumbnail</button>
+            <div className="flex items-center gap-2" role="group" aria-label="Tampilan">
+              <button className={`control-button view-button ${query.view === "list" ? "active" : ""}`} onClick={() => update({ view: "list" })} aria-pressed={query.view === "list"}>Tabel</button>
+              <button className={`control-button view-button ${query.view === "grid" ? "active" : ""}`} onClick={() => update({ view: "grid" })} aria-pressed={query.view === "grid"}>Thumbnail</button>
             </div>
           </div>
         </div>
