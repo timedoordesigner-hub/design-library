@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "./AuthProvider";
-import { GridIcon, LibraryIcon, LoginIcon, PlusIcon, UploadIcon } from "./Icons";
+import { ExternalIcon, GridIcon, LibraryIcon, LoginIcon, PlusIcon, UploadIcon } from "./Icons";
 
 const logo = "/timedoor-logo.png";
 
@@ -41,6 +41,7 @@ export function Sidebar({ open = false, onClose }: Props) {
           })}
         </nav>
         <div className="sidebar-bottom">
+          <a href="https://questwave.vercel.app" target="_blank" rel="noreferrer" className="nav-item mb-5" onClick={onClose}><span className="nav-icon nav-icon-blue" aria-hidden="true"><ExternalIcon /></span>Questwave<span className="ml-auto" aria-hidden="true">↗</span></a>
           <p className="sidebar-label">Account</p>
           {isAdmin ? (
             <button type="button" className="nav-item login-nav w-full text-left" onClick={() => { void signOut(); onClose?.(); }}><span className="nav-icon nav-icon-orange" aria-hidden="true"><LoginIcon /></span>Keluar</button>

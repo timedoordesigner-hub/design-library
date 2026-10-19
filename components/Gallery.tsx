@@ -18,6 +18,9 @@ export function Gallery() {
   const query = useMemo(() => parseQuery(new URLSearchParams(searchParams.toString())), [searchParams]);
   const { categories } = useMemo(() => deriveOptions(designs), [designs]);
   const results = useMemo(() => apply(designs, query), [designs, query]);
+  // Design serupa bisa di luar hasil filter: tambahkan agar viewer tetap terbuka.
+  const activeDesign = query.id ? designs.find((d) => d.id === query.id) : undefined;
+  const viewerDesigns = activeDesign && !results.some((d) => d.id === activeDesign.id) ? [...results, activeDesign] : results;
 
   const update = useCallback((patch: Partial<Query>) => {
     const qs = toParams({ ...query, ...patch }).toString();
@@ -33,21 +36,23 @@ export function Gallery() {
       <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">Semua design</h2>
       <p className="mt-1 text-[13px] text-muted">Arahkan kursor ke thumbnail untuk melihat judul, keyword, dan link Figma.</p>
 
-      <label className="gallery-search" htmlFor="gallery-search">
-        <SearchIcon />
-        <input id="gallery-search" type="search" value={query.q} onChange={(e) => update({ q: e.target.value })} placeholder="Cari judul, keyword, category…" autoComplete="off" />
-      </label>
+      <div className="gallery-sticky">
+        <label className="gallery-search" htmlFor="gallery-search">
+          <SearchIcon />
+          <input id="gallery-search" type="search" value={query.q} onChange={(e) => update({ q: e.target.value })} placeholder="Cari judul, keyword, category…" autoComplete="off" />
+        </label>
 
-      {categories.length > 0 && (
-        <div className="gallery-chips" role="group" aria-label="Filter category">
-          {categories.map((category) => (
-            <button key={category} type="button" className={`control-button ${query.cat.includes(category) ? "active" : ""}`} aria-pressed={query.cat.includes(category)} onClick={() => toggleCategory(category)}>
-              <span className="tone-dot" style={{ background: toneOf(category).accent }} aria-hidden="true" />
-              {category}
-            </button>
-          ))}
-        </div>
-      )}
+        {categories.length > 0 && (
+          <div className="gallery-chips" role="group" aria-label="Filter category">
+            {categories.map((category) => (
+              <button key={category} type="button" className={`control-button ${query.cat.includes(category) ? "active" : ""}`} aria-pressed={query.cat.includes(category)} onClick={() => toggleCategory(category)}>
+                <span className="tone-dot" style={{ background: toneOf(category).accent }} aria-hidden="true" />
+                {category}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {error && <p className="notice notice-warning mt-4" role="alert">{error}</p>}
 
@@ -69,8 +74,8 @@ export function Gallery() {
         )}
       </div>
 
-      {query.id && results.some((d) => d.id === query.id) && (
-        <Viewer designs={results} activeId={query.id} onClose={() => update({ id: null })} onNavigate={(id) => update({ id })} />
+      {activeDesign && (
+        <Viewer designs={viewerDesigns} activeId={activeDesign.id} onClose={() => update({ id: null })} onNavigate={(id) => update({ id })} />
       )}
     </main>
   );

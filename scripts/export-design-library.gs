@@ -70,10 +70,15 @@ function exportJson() {
 
   const rows = [];
   let noImage = 0;
+  const skipped = [];
   for (let i = found.row + 1; i < values.length; i++) {
     const v = values[i];
     const no = Number(v[c.no]);
-    if (!(no > 0) || !String(v[c.nama]).trim()) continue;
+    const nama = String(v[c.nama]).trim();
+    if (!(no > 0) || !nama) {
+      if (nama || String(v[c.no]).trim()) skipped.push("baris " + (i + 1) + ": No=[" + v[c.no] + "] Nama=[" + nama.slice(0, 30) + "]");
+      continue;
+    }
     const label = c.prev >= 0 ? String(v[c.prev]).trim() : "";
     let image = (c.prev >= 0 ? urlOf(rich[i][c.prev]) : "") || chips[i] || "";
     if (!image && label && byName[label]) image = byName[label];
@@ -93,5 +98,9 @@ function exportJson() {
   }
 
   const file = DriveApp.createFile("design-library-export.json", JSON.stringify(rows, null, 1), MimeType.PLAIN_TEXT);
+  if (skipped.length) Logger.log("DILEWATI %s baris:\n%s", skipped.length, skipped.join("\n"));
+  const nos = rows.map((r) => r.sourceNo);
+  const dups = nos.filter((n, k) => nos.indexOf(n) !== k);
+  if (dups.length) Logger.log("No DUPLIKAT (hanya yang pertama diimport): %s", dups.join(", "));
   Logger.log("Tab: %s. %s baris. Tanpa gambar: %s. File: %s", sheet.getName(), rows.length, noImage, file.getUrl());
 }

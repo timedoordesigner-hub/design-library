@@ -87,6 +87,17 @@ export async function deleteDesign(id: number): Promise<void> {
   if (error) throw error;
 }
 
+// Hapus semua baris (per 100 id), lalu best-effort hapus gambar upload di Storage. RLS admin menegakkan hak.
+export async function deleteAllDesigns(): Promise<number> {
+  const items = await getDesigns();
+  for (let i = 0; i < items.length; i += 100) {
+    const { error } = await supabase().from("designs").delete().in("id", items.slice(i, i + 100).map((d) => d.id));
+    if (error) throw error;
+  }
+  await Promise.all(items.map((d) => removePreview(d.image)));
+  return items.length;
+}
+
 export async function uploadPreview(file: File): Promise<string> {
   const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
   const path = `${crypto.randomUUID()}.${ext}`;

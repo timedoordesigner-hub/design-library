@@ -11,12 +11,14 @@ const statusLabel = { new: "Baru", update: "Update", skip: "Dilewati", error: "E
 
 export function ImportForm() {
   const router = useRouter();
-  const { designs, loading, importMany } = useDesigns();
+  const { designs, loading, importMany, removeAll } = useDesigns();
   const { showToast } = useToast();
   const jsonRef = useRef<HTMLInputElement>(null);
   const [rows, setRows] = useState<ParsedMd[]>([]);
   const [overwrite, setOverwrite] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [confirm, setConfirm] = useState("");
+  const [wiping, setWiping] = useState(false);
 
   const plan = useMemo(() => planImport(rows, designs, overwrite), [designs, overwrite, rows]);
   const counts = useMemo(() => ({
@@ -46,6 +48,19 @@ export function ImportForm() {
     }
   };
 
+  const wipe = async () => {
+    setWiping(true);
+    try {
+      const n = await removeAll();
+      setConfirm("");
+      setRows([]);
+      showToast(`${n} data dihapus.`);
+    } catch {
+      showToast("Gagal menghapus. Periksa koneksi atau login admin.", "error");
+    }
+    setWiping(false);
+  };
+
   if (loading) return <main className="content-inner pb-16 pt-7"><div className="skeleton h-64" /></main>;
 
   return (
@@ -59,6 +74,15 @@ export function ImportForm() {
         <p className="mt-1 text-[13px] text-muted">Satu file JSON hasil script <span className="mono">scripts/export-design-library.gs</span>. Gambar Drive harus dibagikan &quot;Anyone with the link&quot;.</p>
         <button type="button" className="control-button mt-3" onClick={() => jsonRef.current?.click()}>Pilih file JSON</button>
         <input ref={jsonRef} className="sr-only" type="file" accept=".json,application/json" onChange={(event) => { void readJson(event.target.files?.[0]); event.target.value = ""; }} />
+      </section>
+
+      <section className="form-card mt-4">
+        <strong>Hapus semua data</strong>
+        <p className="mt-1 text-[13px] text-muted">Menghapus {designs.length} data beserta gambar yang diupload ke Storage. Tidak bisa dibatalkan. Gunakan sebelum upload ulang JSON.</p>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <input className="form-input !w-48" value={confirm} onChange={(event) => setConfirm(event.target.value)} placeholder="Ketik HAPUS" aria-label="Ketik HAPUS untuk konfirmasi" />
+          <button type="button" className="control-button" disabled={confirm !== "HAPUS" || !designs.length || wiping} onClick={() => void wipe()}>{wiping ? "Menghapus…" : "Hapus semua"}</button>
+        </div>
       </section>
 
       {rows.length > 0 && (

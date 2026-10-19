@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Design } from "@/lib/designs";
 import Link from "next/link";
 import { Thumb } from "./Thumb";
 import { PencilIcon, TrashIcon } from "./Icons";
 import { toneOf } from "@/lib/taxonomy";
 import { useAuth } from "./AuthProvider";
+import { useDesigns } from "./DesignsProvider";
+import { similarTo } from "@/lib/similar";
 
 type Props = {
   designs: Design[];
@@ -19,6 +21,7 @@ type Props = {
 export function Viewer({ designs, activeId, onClose, onNavigate, onDelete }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const { isAdmin } = useAuth();
+  const { designs: pool } = useDesigns();
   const activeIndex = designs.findIndex((design) => design.id === activeId);
   const design = designs[activeIndex];
 
@@ -38,6 +41,8 @@ export function Viewer({ designs, activeId, onClose, onNavigate, onDelete }: Pro
     };
   }, [activeIndex, designs, onClose, onNavigate]);
 
+  const similar = useMemo(() => (design ? similarTo(design, pool) : []), [design, pool]);
+
   if (!design) return null;
 
   return (
@@ -49,21 +54,36 @@ export function Viewer({ designs, activeId, onClose, onNavigate, onDelete }: Pro
           <button className="viewer-nav viewer-nav-left" onClick={() => activeIndex > 0 && onNavigate(designs[activeIndex - 1].id)} disabled={activeIndex <= 0} aria-label="Design sebelumnya">←</button>
           <button className="viewer-nav viewer-nav-right" onClick={() => activeIndex < designs.length - 1 && onNavigate(designs[activeIndex + 1].id)} disabled={activeIndex >= designs.length - 1} aria-label="Design berikutnya">→</button>
         </div>
-        <aside className="w-full shrink-0 border-t border-line p-5 sm:w-80 sm:border-l sm:border-t-0 sm:p-7">
+        <aside key={design.id} className="w-full shrink-0 overflow-y-auto border-t border-line p-5 sm:w-80 sm:border-l sm:border-t-0 sm:p-7">
           <div className="mb-10 flex items-start justify-between gap-4"><p className="eyebrow">{String(activeIndex + 1).padStart(2, "0")} / {String(designs.length).padStart(2, "0")}</p><p className="mono text-[10px] text-muted">ESC</p></div>
           <p className="eyebrow" style={{ color: toneOf(design.category).accent }}>{design.category} · {design.subCategory}</p>
           <h2 id="viewer-title" className="mt-2 text-xl font-semibold leading-tight tracking-[-0.02em]">{design.nama}</h2>
           <dl className="mt-8 space-y-5 border-t border-line pt-5">
-            <div><dt className="eyebrow">No</dt><dd className="mt-1 text-sm">{design.sourceNo}</dd></div>
-            <div><dt className="eyebrow">Media type</dt><dd className="mt-1 text-sm text-muted">{design.tipe}</dd></div>
-            <div><dt className="eyebrow">Keyword</dt><dd className="mt-1 text-sm leading-relaxed text-muted">{design.keywords.join(", ")}</dd></div>
-            <div><dt className="eyebrow">Preview</dt><dd className="mt-1 break-words text-xs text-muted">{design.preview}</dd></div>
+            <div><dt className="viewer-label">No</dt><dd className="mt-1 text-sm">{design.sourceNo}</dd></div>
+            <div><dt className="viewer-label">Media type</dt><dd className="mt-1 text-sm text-muted">{design.tipe}</dd></div>
+            <div><dt className="viewer-label">Keyword</dt><dd className="mt-1 text-sm leading-relaxed text-muted">{design.keywords.join(", ") || "—"}</dd></div>
+            <div><dt className="viewer-label">Preview</dt><dd className="mt-1 break-words text-xs text-muted">{design.preview || "—"}</dd></div>
           </dl>
           <div className="mt-10 flex flex-wrap items-center gap-2">
           {design.link && <a href={design.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-sm bg-primary px-3 py-2 text-xs font-medium text-white hover:bg-primary-dark">Buka di Figma <span aria-hidden="true">↗</span></a>}
           {isAdmin && <Link href={`/edit/${design.id}`} className="viewer-action viewer-action-edit"><PencilIcon />Edit</Link>}
           {isAdmin && onDelete && <button type="button" className="viewer-action viewer-action-delete" onClick={() => onDelete(design)}><TrashIcon />Hapus</button>}
         </div>
+          {similar.length > 0 && (
+            <section className="mt-8 border-t border-line pt-5" aria-labelledby="similar-title">
+              <h3 id="similar-title" className="viewer-label">Design serupa</h3>
+              <ul className="viewer-similar">
+                {similar.map((item) => (
+                  <li key={item.id}>
+                    <button type="button" onClick={() => onNavigate(item.id)} title={item.nama}>
+                      <Thumb design={item} compact />
+                      <span>{item.nama}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </aside>
       </div>
     </div>

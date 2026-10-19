@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { deleteDesign, getDesigns, insertDesign, removePreview, updateDesign, upsertDesigns } from "@/lib/store";
+import { deleteAllDesigns, deleteDesign, getDesigns, insertDesign, removePreview, updateDesign, upsertDesigns } from "@/lib/store";
 import type { Design } from "@/lib/designs";
 import { planImport, type ParsedMd } from "@/lib/importMd";
 import { supabaseConfigured } from "@/lib/supabase";
@@ -17,6 +17,7 @@ type DesignsContextValue = {
   update: (id: number, fields: DesignFields) => Promise<Design>;
   remove: (id: number) => Promise<void>;
   importMany: (rows: ParsedMd[], overwrite: boolean) => Promise<{ added: number; updated: number }>;
+  removeAll: () => Promise<number>;
 };
 
 const DesignsContext = createContext<DesignsContextValue | null>(null);
@@ -82,7 +83,14 @@ export function DesignsProvider({ children }: { children: ReactNode }) {
     };
   }, [designs, isAdmin]);
 
-  const value = useMemo(() => ({ designs, loading, error, add, update, remove, importMany }), [add, designs, error, importMany, loading, remove, update]);
+  const removeAll = useCallback(async () => {
+    if (!isAdmin) throw new Error("Khusus admin.");
+    const count = await deleteAllDesigns();
+    setDesigns([]);
+    return count;
+  }, [isAdmin]);
+
+  const value = useMemo(() => ({ designs, loading, error, add, update, remove, importMany, removeAll }), [add, designs, error, importMany, loading, remove, removeAll, update]);
   return <DesignsContext.Provider value={value}>{children}</DesignsContext.Provider>;
 }
 

@@ -16,6 +16,7 @@ const logo = "/timedoor-logo.png";
 export default function LoginPage() {
   const [adminOpen, setAdminOpen] = useState(false);
   const [error, setError] = useState("");
+  const [show, setShow] = useState(false);
 
   const router = useRouter();
   const { signIn } = useAuth();
@@ -55,7 +56,16 @@ export default function LoginPage() {
           {adminOpen ? (
             <form className="login-admin" onSubmit={submit} noValidate>
               <label className="form-label" htmlFor="password">Password admin</label>
-              <input className="form-input" id="password" name="password" type="password" placeholder="Masukkan password" autoComplete="current-password" autoFocus aria-invalid={!!error} aria-describedby={error ? "login-error" : undefined} />
+              <div className="relative">
+                <input className="form-input !pr-11" id="password" name="password" type={show ? "text" : "password"} placeholder="Masukkan password" autoComplete="current-password" autoFocus aria-invalid={!!error} aria-describedby={error ? "login-error" : undefined} />
+                <button type="button" className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted" onClick={() => setShow((s) => !s)} aria-label={show ? "Sembunyikan password" : "Tampilkan password"} aria-pressed={show}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                    <circle cx="12" cy="12" r="3" />
+                    {!show && <path d="M3 3l18 18" />}
+                  </svg>
+                </button>
+              </div>
               {error && <p className="form-error mt-2" id="login-error" role="alert">{error}</p>}
               <button className="login-admin-submit" type="submit" disabled={busy}>{busy ? "Memeriksa…" : "Masuk sebagai admin"}</button>
               <button className="login-toggle" type="button" onClick={() => { setAdminOpen(false); setError(""); }}>Batal</button>
