@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { deriveOptions, type Design } from "@/lib/designs";
-import { apply, parseQuery, toParams, type Query } from "@/lib/query";
+import { apply, correction, parseQuery, toParams, type Query } from "@/lib/query";
 import { toneOf } from "@/lib/taxonomy";
 import { useDesigns } from "./DesignsProvider";
 import { Thumb } from "./Thumb";
@@ -18,6 +18,7 @@ export function Gallery() {
   const query = useMemo(() => parseQuery(new URLSearchParams(searchParams.toString())), [searchParams]);
   const { categories } = useMemo(() => deriveOptions(designs), [designs]);
   const results = useMemo(() => apply(designs, query), [designs, query]);
+  const suggestion = useMemo(() => correction(designs, query.q), [designs, query.q]);
   // Design serupa bisa di luar hasil filter: tambahkan agar viewer tetap terbuka.
   const activeDesign = query.id ? designs.find((d) => d.id === query.id) : undefined;
   const viewerDesigns = activeDesign && !results.some((d) => d.id === activeDesign.id) ? [...results, activeDesign] : results;
@@ -40,6 +41,13 @@ export function Gallery() {
           <SearchIcon />
           <input id="gallery-search" type="search" value={query.q} onChange={(e) => update({ q: e.target.value })} placeholder="Cari judul, keyword, category…" autoComplete="off" />
         </label>
+        <p className="gallery-hint">Pisahkan keyword dengan koma atau spasi, contoh: roadmap, courses.</p>
+        {suggestion && (
+          <p className="gallery-suggest" role="status">
+            Menampilkan hasil untuk <button type="button" onClick={() => update({ q: suggestion })}>{suggestion}</button>
+            . Mungkin maksud kamu itu, bukan “{query.q}”.
+          </p>
+        )}
 
         {categories.length > 0 && (
           <div className="gallery-chips" role="group" aria-label="Filter category">

@@ -137,6 +137,23 @@
   font-size: 13px;
 }
 
+.gallery-hint,
+.gallery-suggest {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.gallery-suggest button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--info-dark);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .gallery-chips {
   display: flex;
   flex-wrap: wrap;
