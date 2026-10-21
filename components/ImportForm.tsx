@@ -76,15 +76,6 @@ export function ImportForm() {
         <input ref={jsonRef} className="sr-only" type="file" accept=".json,application/json" onChange={(event) => { void readJson(event.target.files?.[0]); event.target.value = ""; }} />
       </section>
 
-      <section className="form-card mt-4">
-        <strong>Hapus semua data</strong>
-        <p className="mt-1 text-[13px] text-muted">Menghapus {designs.length} data beserta gambar yang diupload ke Storage. Tidak bisa dibatalkan. Gunakan sebelum upload ulang JSON.</p>
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <input className="form-input !w-48" value={confirm} onChange={(event) => setConfirm(event.target.value)} placeholder="Ketik HAPUS" aria-label="Ketik HAPUS untuk konfirmasi" />
-          <button type="button" className="control-button" disabled={confirm !== "HAPUS" || !designs.length || wiping} onClick={() => void wipe()}>{wiping ? "Menghapus…" : "Hapus semua"}</button>
-        </div>
-      </section>
-
       {rows.length > 0 && (
         <section className="mt-6">
           <div className="import-summary" aria-live="polite">

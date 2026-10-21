@@ -75,7 +75,6 @@ export function Viewer({ designs, activeId, onClose, onNavigate, onDelete }: Pro
           <p className="eyebrow" style={{ color: toneOf(design.category).accent }}>{design.category} · {design.subCategory}</p>
           <h2 id="viewer-title" className="mt-2 text-xl font-semibold leading-tight tracking-[-0.02em]">{design.nama}</h2>
           <dl className="mt-8 space-y-5 border-t border-line pt-5">
-            <div><dt className="viewer-label">No</dt><dd className="mt-1 text-sm">{design.sourceNo}</dd></div>
             <div><dt className="viewer-label">Media type</dt><dd className="mt-1 text-sm text-muted">{design.tipe}</dd></div>
             <div><dt className="viewer-label">Keyword</dt><dd className="mt-1 text-sm leading-relaxed text-muted">{design.keywords.join(", ") || "—"}</dd></div>
             <div><dt className="viewer-label">Preview</dt><dd className="mt-1 break-words text-xs text-muted">{design.preview || "—"}</dd></div>
