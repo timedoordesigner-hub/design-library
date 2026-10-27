@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type DragEvent, type FormEvent } from "react";
 import { validUrl, type Design } from "@/lib/designs";
 import { removePreview, uploadPreview } from "@/lib/store";
-import { categoryGroups, categoryNames, mediaTypes } from "@/lib/taxonomy";
+import { categoryNames, mediaTypes } from "@/lib/taxonomy";
 import { useDesigns, type DesignFields } from "./DesignsProvider";
 import { ImageIcon, InfoIcon } from "./Icons";
 import { useToast } from "./Toast";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
-type Errors = Partial<Record<"nama" | "category" | "subCategory" | "tipe" | "link" | "sourceNo" | "image", string>>;
+type Errors = Partial<Record<"nama" | "category" | "tipe" | "link" | "sourceNo" | "image", string>>;
 
 function readImage(file: File): Promise<{ url: string; w: number; h: number }> {
   return new Promise((resolve, reject) => {
@@ -56,7 +56,6 @@ function FormBody({ existing }: { existing?: Design }) {
 
   const [nama, setNama] = useState(existing?.nama ?? "");
   const [category, setCategory] = useState(existing?.category ?? "");
-  const [subCategory, setSubCategory] = useState(existing?.subCategory ?? "");
   const [tipe, setTipe] = useState(existing?.tipe ?? "");
   const [link, setLink] = useState(existing?.link ?? "");
   const [keywords, setKeywords] = useState(existing?.keywords.join(", ") ?? "");
@@ -74,10 +73,6 @@ function FormBody({ existing }: { existing?: Design }) {
   useEffect(() => { firstErrorRef.current?.focus(); firstErrorRef.current = null; }, [errors]);
 
   const categoryOptions = existing && !categoryNames.includes(existing.category as never) ? [...categoryNames, existing.category] : categoryNames;
-  const subOptions = useMemo(() => {
-    const known: string[] = [...(categoryGroups.find((group) => group.name === category)?.subcategories ?? [])];
-    return subCategory && !known.includes(subCategory) ? [...known, subCategory] : known;
-  }, [category, subCategory]);
   const mediaGroups = useMemo(() => {
     const all: string[] = [...mediaTypes];
     if (tipe && !all.includes(tipe)) all.push(tipe);
@@ -114,7 +109,6 @@ function FormBody({ existing }: { existing?: Design }) {
     const next: Errors = {};
     if (!nama.trim()) next.nama = "Nama file wajib diisi.";
     if (!category) next.category = "Category wajib dipilih.";
-    if (!subCategory) next.subCategory = "Sub category wajib dipilih.";
     if (!tipe) next.tipe = "Media type wajib dipilih.";
     if (!Number.isInteger(no) || no < 1) next.sourceNo = "No harus bilangan bulat positif.";
     else if (designs.some((d) => d.sourceNo === no && d.id !== existing?.id)) next.sourceNo = "No ini sudah dipakai file lain.";
@@ -131,7 +125,7 @@ function FormBody({ existing }: { existing?: Design }) {
       sourceNo: no,
       nama: nama.trim(),
       category,
-      subCategory,
+      subCategory: existing?.subCategory ?? "-", // ponytail: kolom DB masih ada; UI tidak memakainya lagi
       tipe,
       link: link.trim(),
       keywords: keywords.split(",").map((k) => k.trim()).filter(Boolean),
@@ -203,19 +197,11 @@ function FormBody({ existing }: { existing?: Design }) {
             <div className="form-row">
               <div className="form-field">
                 <label className="form-label" htmlFor="field-category">Category *</label>
-                <select id="field-category" className="form-input" value={category} onChange={(e) => { setCategory(e.target.value); setSubCategory(""); }} {...aria("category")}>
+                <select id="field-category" className="form-input" value={category} onChange={(e) => setCategory(e.target.value)} {...aria("category")}>
                   <option value="">Pilih category</option>
                   {categoryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
                 {err("category")}
-              </div>
-              <div className="form-field">
-                <label className="form-label" htmlFor="field-subCategory">Sub category *</label>
-                <select id="field-subCategory" className="form-input" value={subCategory} onChange={(e) => setSubCategory(e.target.value)} disabled={!category} {...aria("subCategory")}>
-                  <option value="">{category ? "Pilih sub category" : "Pilih category dulu"}</option>
-                  {subOptions.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-                {err("subCategory")}
               </div>
             </div>
             <div className="form-field">

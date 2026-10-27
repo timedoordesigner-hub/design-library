@@ -73,7 +73,19 @@ export function Gallery() {
           </div>
         ) : (
           <>
-            <p className="mb-3 text-[11px] text-muted" aria-live="polite">{results.length} design</p>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-[11px] text-muted" aria-live="polite">{results.length} design</p>
+              <label className="sr-only" htmlFor="gallery-sort">Urutkan</label>
+              <select
+                id="gallery-sort"
+                className="control-select"
+                value={query.dir}
+                onChange={(e) => update({ sort: "no", dir: e.target.value === "desc" ? "desc" : "asc" })}
+              >
+                <option value="asc">Old ➞ New</option>
+                <option value="desc">New ➞ Old</option>
+              </select>
+            </div>
             <ul className="gallery-grid">
               {results.map((design) => <li key={design.id}><GalleryCard design={design} onOpen={() => update({ id: design.id })} /></li>)}
             </ul>
@@ -98,7 +110,7 @@ function GalleryCard({ design, onOpen }: { design: Design; onOpen: () => void })
       </div>
       <div className="gallery-info">
         <h3>{design.nama}</h3>
-        <p className="gallery-meta">{design.category} / {design.subCategory} / {design.tipe}</p>
+        <p className="gallery-meta">{design.category} / {design.tipe}</p>
         {design.keywords.length > 0 && (
           <ul className="tag-list" aria-label="Keyword">
             {design.keywords.slice(0, 8).map((keyword) => <li key={keyword} className="tag">{keyword}</li>)}

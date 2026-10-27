@@ -72,7 +72,7 @@ export function Viewer({ designs, activeId, onClose, onNavigate, onDelete }: Pro
         </div>
         <aside key={design.id} className="w-full shrink-0 overflow-y-auto border-t border-line p-5 sm:w-80 sm:border-l sm:border-t-0 sm:p-7">
           <div className="mb-10 flex items-start justify-between gap-4"><p className="eyebrow">{String(activeIndex + 1).padStart(2, "0")} / {String(designs.length).padStart(2, "0")}</p><p className="mono text-[10px] text-muted">ESC</p></div>
-          <p className="eyebrow" style={{ color: toneOf(design.category).accent }}>{design.category} · {design.subCategory}</p>
+          <p className="eyebrow" style={{ color: toneOf(design.category).accent }}>{design.category}</p>
           <h2 id="viewer-title" className="mt-2 text-xl font-semibold leading-tight tracking-[-0.02em]">{design.nama}</h2>
           <dl className="mt-8 space-y-5 border-t border-line pt-5">
             <div><dt className="viewer-label">Media type</dt><dd className="mt-1 text-sm text-muted">{design.tipe}</dd></div>

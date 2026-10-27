@@ -29,12 +29,12 @@ export function Library() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Design | null>(null);
   const lastFocusRef = useRef<HTMLElement | null>(null);
-  const { categories, subCategories, tipes } = useMemo(() => deriveOptions(designs), [designs]);
+  const { categories, tipes } = useMemo(() => deriveOptions(designs), [designs]);
 
   const results = useMemo(() => apply(designs, query), [designs, query]);
   const activeDesign = query.id ? designs.find((design) => design.id === query.id) : null;
   const viewerDesigns = activeDesign && !results.some((design) => design.id === activeDesign.id) ? [...results, activeDesign] : results;
-  const filterCount = query.cat.length + query.sub.length + query.tipe.length;
+  const filterCount = query.cat.length + query.tipe.length;
   const hasFilters = filterCount > 0;
 
   const update = useCallback((changes: Partial<Query>) => {
@@ -66,7 +66,7 @@ export function Library() {
     }
   };
 
-  const toggleValue = (key: "cat" | "sub" | "tipe", value: string) => {
+  const toggleValue = (key: "cat" | "tipe", value: string) => {
     const values = query[key].includes(value) ? query[key].filter((v) => v !== value) : [...query[key], value];
     update({ [key]: values });
   };
@@ -85,7 +85,7 @@ export function Library() {
         {error && <p className="notice notice-warning mt-4" role="alert">{error} Data baru tidak akan tersimpan.</p>}
         <section className="stat-row mt-6" aria-label="Ringkasan library">
           <div className="stat-card stat-green"><span className="eyebrow">Total file</span><strong>{designs.length}</strong><span className="stat-caption">file terdaftar</span></div>
-          <div className="stat-card stat-blue"><span className="eyebrow">Category</span><strong>{categories.length}</strong><span className="stat-caption">{subCategories.length} sub category</span></div>
+          <div className="stat-card stat-blue"><span className="eyebrow">Category</span><strong>{categories.length}</strong><span className="stat-caption">kategori terdaftar</span></div>
           <div className="stat-card stat-orange"><span className="eyebrow">Media type</span><strong>{tipes.length}</strong><span className="stat-caption">jenis media</span></div>
         </section>
         <div className="toolbar mt-7 flex flex-wrap items-center justify-between gap-3">
@@ -98,12 +98,12 @@ export function Library() {
           <div className="toolbar-actions flex items-center gap-2">
             <label className="sr-only" htmlFor="sort">Urutkan</label>
             <select id="sort" className="control-select" value={query.sort} onChange={(e) => update({ sort: e.target.value as SortKey })}>
-              <option value="no">Urut: No</option>
+              <option value="no">Urut: Terlama / Terbaru</option>
               <option value="nama">Urut: Nama</option>
               <option value="category">Urut: Category</option>
               <option value="tipe">Urut: Media type</option>
             </select>
-            <button className="control-button" onClick={() => update({ dir: query.dir === "asc" ? "desc" : "asc" })} aria-label={query.dir === "asc" ? "Urutan naik, klik untuk turun" : "Urutan turun, klik untuk naik"}>{query.dir === "asc" ? "A→Z" : "Z→A"}</button>
+            <button className="control-button" onClick={() => update({ dir: query.dir === "asc" ? "desc" : "asc" })} aria-label={query.dir === "asc" ? "Urutan naik, klik untuk turun" : "Urutan turun, klik untuk naik"}>{query.sort === "no" ? (query.dir === "asc" ? "Lama→Baru" : "Baru→Lama") : query.dir === "asc" ? "A→Z" : "Z→A"}</button>
             <div className="flex items-center gap-2" role="group" aria-label="Tampilan">
               <button className={`control-button view-button ${query.view === "list" ? "active" : ""}`} onClick={() => update({ view: "list" })} aria-pressed={query.view === "list"}>Tabel</button>
               <button className={`control-button view-button ${query.view === "grid" ? "active" : ""}`} onClick={() => update({ view: "grid" })} aria-pressed={query.view === "grid"}>Thumbnail</button>
@@ -114,9 +114,8 @@ export function Library() {
         {filterOpen && (
           <div className="filter-panel mt-3 grid gap-6 p-5">
             <FilterGroup label="Category" values={categories} selected={query.cat} onToggle={(v) => toggleValue("cat", v)} tone />
-            <FilterGroup label="Sub category" values={subCategories} selected={query.sub} onToggle={(v) => toggleValue("sub", v)} />
             <FilterGroup label="Media type" values={tipes} selected={query.tipe} onToggle={(v) => toggleValue("tipe", v)} />
-            {hasFilters && <button className="control-button w-fit" onClick={() => update({ cat: [], sub: [], tipe: [] })}>Hapus filter</button>}
+            {hasFilters && <button className="control-button w-fit" onClick={() => update({ cat: [], tipe: [] })}>Hapus filter</button>}
           </div>
         )}
 
@@ -212,9 +211,9 @@ function Table({ items, onOpen, onDelete }: { items: Design[]; onOpen: OpenHandl
           <span className="table-no" role="cell">{design.sourceNo}</span>
           <span className="min-w-0" role="cell">
             <span className="file-name block">{design.nama}</span>
-            <span className="file-subtext mt-0.5 block">{design.subCategory} · {design.tipe}</span>
+            <span className="file-subtext mt-0.5 block">{design.tipe}</span>
           </span>
-          <span className="min-w-0" role="cell"><CategoryChip category={design.category} /><span className="file-subtext mt-1 block">{design.subCategory}</span></span>
+          <span className="min-w-0" role="cell"><CategoryChip category={design.category} /></span>
           <span role="cell" className="min-w-0"><span className="type-label">{design.tipe}</span></span>
           <span role="cell"><span className="tag-list">{design.keywords.slice(0, 3).map((k) => <span key={k} className="tag">{k}</span>)}</span></span>
           <span className="table-cell-muted" role="cell">{design.note || "—"}</span>
@@ -238,7 +237,6 @@ function CardGrid({ items, onOpen, onDelete }: { items: Design[]; onOpen: OpenHa
               <span className="mono text-[10px] text-muted-soft">{design.sourceNo}</span>
               <strong className="mt-1 block text-[13px] font-medium leading-snug">{design.nama}</strong>
               <span className="mt-2 flex flex-wrap items-center gap-1.5"><CategoryChip category={design.category} /><span className="type-label">{design.tipe}</span></span>
-              <span className="file-subtext mt-1 block">{design.subCategory}</span>
             </span>
           </button>
           {onDelete && <div className="file-card-actions"><RowActions design={design} onDelete={onDelete} /></div>}

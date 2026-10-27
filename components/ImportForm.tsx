@@ -106,7 +106,7 @@ function ReviewRow({ row }: { row: PlanRow }) {
       <span><b className={`import-status import-status-${row.status}`}>{statusLabel[row.status]}</b></span>
       <span className="import-file" title={row.file}>{row.file}</span>
       <span className="mono">{fields?.sourceNo ?? "—"}</span>
-      <span><strong>{fields?.nama ?? "—"}</strong><small>{fields ? `${fields.category} / ${fields.subCategory} / ${fields.tipe}` : "Data belum lengkap"}</small></span>
+      <span><strong>{fields?.nama ?? "—"}</strong><small>{fields ? `${fields.category} / ${fields.tipe}` : "Data belum lengkap"}</small></span>
       <span className={row.status === "error" ? "import-message-error" : "import-message"}>{row.messages.length ? row.messages.join(" ") : "Siap diimport."}</span>
     </div>
   );
