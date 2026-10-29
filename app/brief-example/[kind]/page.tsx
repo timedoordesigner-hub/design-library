@@ -2,6 +2,11 @@ import { notFound } from "next/navigation";
 import { PrintButton } from "@/components/PrintButton";
 import { briefExamples } from "@/lib/briefExamples";
 
+// Known slugs are prerendered at build time; Cache Components rejects unknown params outside Suspense.
+export function generateStaticParams() {
+  return Object.keys(briefExamples).map((kind) => ({ kind }));
+}
+
 // Paper-style page meant to open in a new tab; "Save as PDF" uses the browser print dialog.
 export default async function BriefExamplePage({ params }: PageProps<"/brief-example/[kind]">) {
   const { kind } = await params;
