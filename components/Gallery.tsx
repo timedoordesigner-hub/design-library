@@ -19,7 +19,7 @@ export function Gallery() {
   const { categories } = useMemo(() => deriveOptions(designs), [designs]);
   const results = useMemo(() => apply(designs, query), [designs, query]);
   const suggestion = useMemo(() => correction(designs, query.q), [designs, query.q]);
-  // Design serupa bisa di luar hasil filter: tambahkan agar viewer tetap terbuka.
+  // Similar designs may fall outside the filtered results: append so the viewer stays open.
   const activeDesign = query.id ? designs.find((d) => d.id === query.id) : undefined;
   const viewerDesigns = activeDesign && !results.some((d) => d.id === activeDesign.id) ? [...results, activeDesign] : results;
 
@@ -33,24 +33,24 @@ export function Gallery() {
 
   return (
     <main className="content-inner pb-16 pt-7">
-      <h2 className="text-xl font-semibold tracking-[-0.02em]">Semua design</h2>
-      <p className="mt-1 text-[13px] text-muted">Arahkan kursor ke thumbnail untuk melihat judul, keyword, dan link Figma.</p>
+      <h2 className="text-xl font-semibold tracking-[-0.02em]">All designs</h2>
+      <p className="mt-1 text-[13px] text-muted">Hover over a thumbnail to see its title, keywords, and Figma link.</p>
 
       <div className="gallery-sticky">
         <label className="gallery-search" htmlFor="gallery-search">
           <SearchIcon />
-          <input id="gallery-search" type="search" value={query.q} onChange={(e) => update({ q: e.target.value })} placeholder="Cari judul, keyword, category…" autoComplete="off" />
+          <input id="gallery-search" type="search" value={query.q} onChange={(e) => update({ q: e.target.value })} placeholder="Search title, keyword, category…" autoComplete="off" />
         </label>
-        <p className="gallery-hint">Pisahkan keyword dengan koma atau spasi, contoh: roadmap, courses.</p>
+        <p className="gallery-hint">Separate keywords with commas or spaces, e.g. roadmap, courses.</p>
         {suggestion && (
           <p className="gallery-suggest" role="status">
-            Menampilkan hasil untuk <button type="button" onClick={() => update({ q: suggestion })}>{suggestion}</button>
-            . Mungkin maksud kamu itu, bukan “{query.q}”.
+            Showing results for <button type="button" onClick={() => update({ q: suggestion })}>{suggestion}</button>
+            . Did you mean this instead of “{query.q}”?
           </p>
         )}
 
         {categories.length > 0 && (
-          <div className="gallery-chips" role="group" aria-label="Filter category">
+          <div className="gallery-chips" role="group" aria-label="Filter by category">
             {categories.map((category) => (
               <button key={category} type="button" className={`control-button ${query.cat.includes(category) ? "active" : ""}`} aria-pressed={query.cat.includes(category)} onClick={() => toggleCategory(category)}>
                 <span className="tone-dot" style={{ background: toneOf(category).accent }} aria-hidden="true" />
@@ -65,25 +65,25 @@ export function Gallery() {
 
       <div className="mt-5">
         {loading ? (
-          <div className="skeleton h-72" aria-label="Memuat data" />
+          <div className="skeleton h-72" aria-label="Loading data" />
         ) : results.length === 0 ? (
           <div className="empty-state px-6 py-20 text-center">
-            <p className="text-base font-medium">{designs.length ? "Tidak ada design yang cocok." : "Belum ada design."}</p>
-            {designs.length > 0 && <button type="button" className="control-button mt-4" onClick={() => update({ q: "", cat: [] })}>Hapus pencarian</button>}
+            <p className="text-base font-medium">{designs.length ? "No matching designs." : "No designs yet."}</p>
+            {designs.length > 0 && <button type="button" className="control-button mt-4" onClick={() => update({ q: "", cat: [] })}>Clear search</button>}
           </div>
         ) : (
           <>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <p className="text-[11px] text-muted" aria-live="polite">{results.length} design</p>
-              <label className="sr-only" htmlFor="gallery-sort">Urutkan</label>
+              <p className="text-[11px] text-muted" aria-live="polite">{results.length} {results.length === 1 ? "design" : "designs"}</p>
+              <label className="sr-only" htmlFor="gallery-sort">Sort by</label>
               <select
                 id="gallery-sort"
                 className="control-select"
                 value={query.dir}
                 onChange={(e) => update({ sort: "no", dir: e.target.value === "desc" ? "desc" : "asc" })}
               >
-                <option value="asc">Old ➞ New</option>
-                <option value="desc">New ➞ Old</option>
+                <option value="asc">Oldest to newest</option>
+                <option value="desc">Newest to oldest</option>
               </select>
             </div>
             <ul className="gallery-grid">

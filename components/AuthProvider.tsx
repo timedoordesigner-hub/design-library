@@ -18,7 +18,7 @@ const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "";
 // Role dibaca dari app_metadata (hanya bisa diubah server/SQL). UI hanya cermin; RLS yang menegakkan.
 const roleOf = (session: Session | null): Role => (session?.user.app_metadata?.role === "admin" ? "admin" : "viewer");
 
-const AuthContext = createContext<AuthValue>({ role: "viewer", isAdmin: false, ready: false, signIn: async () => "Belum siap.", signOut: async () => undefined });
+const AuthContext = createContext<AuthValue>({ role: "viewer", isAdmin: false, ready: false, signIn: async () => "Not ready yet.", signOut: async () => undefined });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -41,13 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = useCallback(async (password: string) => {
-    if (!supabaseConfigured) return "Supabase belum dikonfigurasi (.env.local).";
-    if (!ADMIN_EMAIL) return "NEXT_PUBLIC_ADMIN_EMAIL belum diisi di .env.local.";
+    if (!supabaseConfigured) return "Supabase is not configured (.env.local).";
+    if (!ADMIN_EMAIL) return "NEXT_PUBLIC_ADMIN_EMAIL is not set in .env.local.";
     const { data, error } = await supabase().auth.signInWithPassword({ email: ADMIN_EMAIL, password });
-    if (error) return error.status === 400 ? "Password salah." : "Gagal masuk. Coba lagi.";
+    if (error) return error.status === 400 ? "Wrong password." : "Sign in failed. Please try again.";
     if (roleOf(data.session) !== "admin") {
       await supabase().auth.signOut();
-      return "Akun ini bukan admin.";
+      return "This account is not an admin.";
     }
     return null;
   }, []);

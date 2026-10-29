@@ -6,7 +6,7 @@ import { useAuth } from "./AuthProvider";
 
 export const ENTERED_KEY = "dl-entered";
 
-// ponytail: gate sisi klien per-tab (sessionStorage), bukan keamanan; RLS tetap yang menegakkan. Upgrade: middleware + cookie.
+// ponytail: client-side per-tab gate (sessionStorage), not security; RLS remains authoritative. Upgrade: middleware + cookie.
 export function enter() {
   try { sessionStorage.setItem(ENTERED_KEY, "1"); } catch {}
 }

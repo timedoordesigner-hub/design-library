@@ -6,7 +6,7 @@ import { useState, type FormEvent } from "react";
 import { useDesigns } from "./DesignsProvider";
 import { GridIcon, SearchIcon } from "./Icons";
 
-const hints = ["keyword", "judul", "category", "media type"];
+const hints = ["keyword", "title", "category", "media type"];
 
 export function SearchHome() {
   const router = useRouter();
@@ -22,13 +22,13 @@ export function SearchHome() {
   return (
     <main className="search-home">
       <p className="eyebrow">Design Library</p>
-      <h2 className="search-home-title">Cari design Timedoor Academy</h2>
+      <h2 className="search-home-title">Search Timedoor Academy designs</h2>
       <p className="search-home-hint">
-        Ketik di sini untuk mencari design berdasarkan{" "}
+        Type here to search designs by{" "}
         {hints.map((hint, index) => (
           <span key={hint}>
             <b>{hint}</b>
-            {index < hints.length - 2 ? ", " : index === hints.length - 2 ? " atau " : ""}
+            {index < hints.length - 2 ? ", " : index === hints.length - 2 ? " or " : ""}
           </span>
         ))}
         .
@@ -40,15 +40,15 @@ export function SearchHome() {
           type="search"
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          placeholder="Contoh: roadmap, banner, courses…"
-          aria-label="Cari design"
+          placeholder="Example: roadmap, banner, courses…"
+          aria-label="Search designs"
           autoComplete="off"
         />
-        <button type="submit" className="primary-button">Cari</button>
+        <button type="submit" className="primary-button">Search</button>
       </form>
       <Link href="/thumbnail" className="search-home-link">
         <GridIcon />
-        Lihat semua design{!loading && ` (${designs.length})`}
+        Browse all designs{!loading && ` (${designs.length})`}
         <span aria-hidden="true">→</span>
       </Link>
     </main>

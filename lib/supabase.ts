@@ -9,7 +9,7 @@ export const supabaseConfigured = Boolean(url && anonKey);
 let client: SupabaseClient | null = null;
 
 export function supabase(): SupabaseClient {
-  if (!url || !anonKey) throw new Error("Supabase belum dikonfigurasi: isi NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di .env.local lalu restart dev server.");
+  if (!url || !anonKey) throw new Error("Supabase is not configured: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local, then restart the dev server.");
   return (client ??= createClient(url, anonKey));
 }
 

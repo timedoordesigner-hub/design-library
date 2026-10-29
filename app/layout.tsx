@@ -15,13 +15,13 @@ const mono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Timedor Academy Design File Library",
-  description: "Database file desain Timedor Academy untuk pencarian dan akses aset.",
+  title: "Timedoor Academy Design File Library",
+  description: "Timedoor Academy design file database for searching and accessing assets.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className={`${sans.variable} ${mono.variable} h-full antialiased`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable} h-full antialiased`}>
       <body className="min-h-full"><AuthProvider>{children}</AuthProvider></body>
     </html>
   );

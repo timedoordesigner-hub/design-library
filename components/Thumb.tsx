@@ -25,7 +25,7 @@ export function Thumb({ design, compact = false }: Props) {
     <div className={`thumb ${compact ? "thumb-compact" : ""}`} style={style} aria-label={`Preview ${design.preview}`} role="img">
       <div className="thumb-topline" />
       <div className="thumb-copy">
-        <span className="thumb-kicker">TIMEDOR ACADEMY</span>
+        <span className="thumb-kicker">TIMEDOOR ACADEMY</span>
         <span className="thumb-title">{design.nama}</span>
       </div>
       <div className="thumb-shape" />

@@ -15,7 +15,7 @@ export function Topbar({ onMenu }: Props) {
   const query = parseQuery(new URLSearchParams(searchParams.toString()));
   const searchRef = useRef<HTMLInputElement>(null);
   const { isAdmin } = useAuth();
-  const title = pathname === "/tambah" ? "Tambah file" : pathname === "/thumbnail" ? "Design Library" : pathname === "/library" ? "Library" : pathname.startsWith("/edit/") ? "Edit file" : "Cari design";
+  const title = pathname === "/tambah" ? "Add File" : pathname.startsWith("/panduan") ? "Request Guide" : pathname === "/thumbnail" ? "Design Library" : pathname === "/library" ? "Manage Library" : pathname.startsWith("/edit/") ? "Edit File" : "Search";
 
   const updateSearch = (value: string) => {
     const next = { ...query, q: value };
@@ -38,14 +38,14 @@ export function Topbar({ onMenu }: Props) {
   return (
     <header className="topbar">
       <div className="topbar-left">
-        <button className="menu-button" onClick={onMenu} aria-label="Buka menu">☰</button>
+        <button className="menu-button" onClick={onMenu} aria-label="Open menu">☰</button>
         <h1 className="topbar-title">{title}</h1>
       </div>
       <div className="topbar-right">
         {pathname === "/library" && isAdmin && (
           <label className="topbar-search" htmlFor="topbar-search">
             <span aria-hidden="true">⌕</span>
-            <input id="topbar-search" ref={searchRef} value={query.q} onChange={(e) => updateSearch(e.target.value)} placeholder="Cari design…" autoComplete="off" />
+            <input id="topbar-search" ref={searchRef} value={query.q} onChange={(e) => updateSearch(e.target.value)} placeholder="Search designs…" autoComplete="off" />
             <kbd className="mono">/</kbd>
           </label>
         )}

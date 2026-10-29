@@ -19,12 +19,12 @@ export function ConfirmDialog({ name, onCancel, onConfirm }: { name: string; onC
   return (
     <div className="confirm-backdrop fixed inset-0 z-[70] flex items-center justify-center p-4" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
       <section className="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-copy">
-        <p className="eyebrow text-warning">Hapus file</p>
-        <h2 id="confirm-title" className="mt-2 text-lg font-semibold">Hapus “{name}”?</h2>
-        <p id="confirm-copy" className="mt-2 text-[13px] text-muted">Tindakan ini tidak bisa dibatalkan.</p>
+        <p className="eyebrow text-warning">Delete file</p>
+        <h2 id="confirm-title" className="mt-2 text-lg font-semibold">Delete “{name}”?</h2>
+        <p id="confirm-copy" className="mt-2 text-[13px] text-muted">This action cannot be undone.</p>
         <div className="mt-6 flex justify-end gap-2">
-          <button ref={cancelRef} className="control-button" onClick={onCancel}>Batal</button>
-          <button className="danger-button" onClick={onConfirm}>Hapus</button>
+          <button ref={cancelRef} className="control-button" onClick={onCancel}>Cancel</button>
+          <button className="danger-button" onClick={onConfirm}>Delete</button>
         </div>
       </section>
     </div>

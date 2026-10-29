@@ -11,14 +11,12 @@ const statusLabel = { new: "Baru", update: "Update", skip: "Dilewati", error: "E
 
 export function ImportForm() {
   const router = useRouter();
-  const { designs, loading, importMany, removeAll } = useDesigns();
+  const { designs, loading, importMany } = useDesigns();
   const { showToast } = useToast();
   const jsonRef = useRef<HTMLInputElement>(null);
   const [rows, setRows] = useState<ParsedMd[]>([]);
   const [overwrite, setOverwrite] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [confirm, setConfirm] = useState("");
-  const [wiping, setWiping] = useState(false);
 
   const plan = useMemo(() => planImport(rows, designs, overwrite), [designs, overwrite, rows]);
   const counts = useMemo(() => ({
@@ -46,19 +44,6 @@ export function ImportForm() {
       showToast("Gagal menyimpan. Periksa koneksi atau login admin, lalu import ulang (aman diulang).", "error");
       setSaving(false);
     }
-  };
-
-  const wipe = async () => {
-    setWiping(true);
-    try {
-      const n = await removeAll();
-      setConfirm("");
-      setRows([]);
-      showToast(`${n} data dihapus.`);
-    } catch {
-      showToast("Gagal menghapus. Periksa koneksi atau login admin.", "error");
-    }
-    setWiping(false);
   };
 
   if (loading) return <main className="content-inner pb-16 pt-7"><div className="skeleton h-64" /></main>;

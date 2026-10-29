@@ -98,7 +98,7 @@ export function Library() {
           <div className="toolbar-actions flex items-center gap-2">
             <label className="sr-only" htmlFor="sort">Urutkan</label>
             <select id="sort" className="control-select" value={query.sort} onChange={(e) => update({ sort: e.target.value as SortKey })}>
-              <option value="no">Urut: Terlama / Terbaru</option>
+              <option value="no">Urut: Old / New </option>
               <option value="nama">Urut: Nama</option>
               <option value="category">Urut: Category</option>
               <option value="tipe">Urut: Media type</option>
