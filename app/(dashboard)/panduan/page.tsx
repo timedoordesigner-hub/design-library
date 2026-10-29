@@ -5,16 +5,16 @@ const notionUrl =
   "https://app.notion.com/p/timedoor/Timedoor-Academy-Request-3068150cf41a80dcbfd0fd5eb9333607?source=copy_link";
 
 const steps = [
-  ["1", "Check the library", "Your asset may already exist."],
-  ["2", "Write the brief", "Use the example as your guide."],
-  ["3", "Submit once", "Spreadsheet row + WhatsApp message."],
-  ["4", "Track in Notion", "Follow the queue and status on the Notion link."],
+  { title: "Check the library", text: "Your asset may already exist. Search the Design Library before you request something new.", href: "/", button: "Search designs first" },
+  { title: "Write the brief", text: "Describe the purpose, content, size, and deadline. Use the example as your guide.", href: "/panduan/request#brief", button: "Open brief example", primary: true },
+  { title: "Submit once", text: "Add one row to your team spreadsheet, then send one WhatsApp message tagging @Timedoor Designer.", href: "/panduan/request", button: "How to submit" },
+  { title: "Track in Notion", text: "After the design team confirms, follow the queue and status on the Notion page.", href: notionUrl, button: "Open Notion page", external: true },
 ];
 
 const cards = [
   { title: "Search the library", text: "Your asset may already exist. Check before you request.", href: "/", button: "Search designs" },
   { title: "Priority & scope", text: "See your queue time and what the design team handles.", href: "/panduan/priority", button: "View priority" },
-  { title: "Request example", text: "See exactly what to write in your team spreadsheet.", href: "/panduan/request", button: "See the example", primary: true },
+  { title: "Submit & track", text: "Spreadsheet, brief example, WhatsApp message, and Notion tracking in one page.", href: "/panduan/request", button: "See how", primary: true },
   { title: "FAQ & help", text: "Returned request, last-minute work, or contact the team.", href: "/panduan/help", button: "Get help" },
 ];
 
@@ -25,16 +25,25 @@ export default function GuideOverviewPage() {
         <p className="eyebrow">REQUEST GUIDE</p>
         <h2>Need a design? Write a clear request in 4 steps.</h2>
         <p>Check the library, follow the example, submit once, and track the result.</p>
-        <div className="guide-actions">
-          <Link href="/panduan/request" className="primary-button">See request example <span aria-hidden="true">→</span></Link>
-          <Link href="/" className="control-button">Search designs first <span aria-hidden="true">→</span></Link>
-        </div>
       </section>
 
       <ol className="guide-steps">
-        {steps.map(([number, title, text]) => (
-          <li key={number}><span>{number}</span><strong>{title}</strong><p>{text}</p></li>
-        ))}
+        {steps.map((step, index) => {
+          const className = step.primary ? "primary-button" : "control-button";
+          const label = <>{step.button} <span aria-hidden="true">{step.external ? "↗" : "→"}</span></>;
+          return (
+            <li key={step.title}>
+              <span>{index + 1}</span>
+              <div>
+                <strong>{step.title}</strong>
+                <p>{step.text}</p>
+                {step.external
+                  ? <a href={step.href} target="_blank" rel="noreferrer" className={className}>{label}</a>
+                  : <Link href={step.href} className={className}>{label}</Link>}
+              </div>
+            </li>
+          );
+        })}
       </ol>
 
       <section className="guide-notion-card">

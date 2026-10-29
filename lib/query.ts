@@ -97,7 +97,7 @@ export function apply(all: Design[], q: Query): Design[] {
     if (q.tipe.length && !q.tipe.includes(design.tipe)) return false;
     return true;
   });
-  // Tampilkan design yang cocok dengan keyword terbanyak (semua keyword cocok = paling atas dan satu-satunya).
+  // Show designs matching the most keywords (all keywords matched = top and only result).
   const scores = new Map(filtered.map((d) => [d, words.filter((w) => haystack(d).includes(w)).length]));
   const best = words.length ? Math.max(0, ...scores.values()) : 0;
   if (words.length) {

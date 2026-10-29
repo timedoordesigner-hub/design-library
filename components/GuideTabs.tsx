@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   ["/panduan", "1", "Overview"],
   ["/panduan/priority", "2", "Priority & scope"],
-  ["/panduan/request", "3", "Request example"],
+  ["/panduan/request", "3", "Submit & track"],
   ["/panduan/help", "4", "FAQ & help"],
 ];
 

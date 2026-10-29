@@ -16,7 +16,7 @@ preview: Design Roadmap Courses.png
 w: 16
 h: 9
 ---
-Catatan design di sini.
+Design notes here.
 `;
 
 export type ImportFields = Omit<Design, "id" | "image" | "w" | "h"> & { w?: number; h?: number; image?: string };
@@ -43,7 +43,7 @@ export function parseDesignMd(text: string, file: string): ParsedMd {
   lines.slice(1, end).forEach((line, i) => {
     if (!line.trim() || line.trimStart().startsWith("#")) return;
     const colon = line.indexOf(":");
-    if (colon < 1) return void errors.push(`Baris ${i + 2}: format must be "key: value".`);
+    if (colon < 1) return void errors.push(`Line ${i + 2}: format must be "key: value".`);
     const key = line.slice(0, colon).trim();
     if (key in raw) return void errors.push(`Line ${i + 2}: duplicate key "${key}".`);
     raw[key] = unquote(line.slice(colon + 1).trim());
@@ -61,14 +61,14 @@ export function parseDesignMd(text: string, file: string): ParsedMd {
   (["w", "h"] as const).forEach((key) => {
     if (!raw[key]) return;
     dims[key] = positiveInt(raw[key]);
-    if (dims[key] === undefined) errors.push(`${key} harus bilangan bulat positif.`);
+    if (dims[key] === undefined) errors.push(`${key} must be a positive whole number.`);
   });
   if (errors.length) return { file, errors, warnings };
 
   const subs: string[] = categoryGroups.flatMap((g) => [...g.subcategories]);
-  if (!(categoryNames as string[]).includes(raw.category)) warnings.push(`Category "${raw.category}" di luar daftar.`);
-  if (!subs.includes(raw.subCategory)) warnings.push(`Sub category "${raw.subCategory}" di luar daftar.`);
-  if (!(mediaTypes as readonly string[]).includes(raw.tipe)) warnings.push(`Media type "${raw.tipe}" di luar daftar.`);
+  if (!(categoryNames as string[]).includes(raw.category)) warnings.push(`Category "${raw.category}" is not in the list.`);
+  if (!subs.includes(raw.subCategory)) warnings.push(`Sub category "${raw.subCategory}" is not in the list.`);
+  if (!(mediaTypes as readonly string[]).includes(raw.tipe)) warnings.push(`Media type "${raw.tipe}" is not in the list.`);
 
   const kw = (raw.keywords ?? "").replace(/^\[|\]$/g, "");
   return {

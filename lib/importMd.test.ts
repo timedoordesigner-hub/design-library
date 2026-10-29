@@ -7,7 +7,7 @@ const ok = parseDesignMd(TEMPLATE, "a.md");
 assert.deepEqual(ok.errors, []);
 assert.equal(ok.fields?.sourceNo, 272);
 assert.deepEqual(ok.fields?.keywords, ["roadmap", "courses", "all courses"]);
-assert.equal(ok.fields?.note, "Catatan design di sini.");
+assert.equal(ok.fields?.note, "Design notes here.");
 
 const crlf = parseDesignMd("﻿" + TEMPLATE.replace(/\n/g, "\r\n").replace("[roadmap, courses, all courses]", "a, b"), "b.md");
 assert.deepEqual(crlf.errors, []);
@@ -15,11 +15,11 @@ assert.deepEqual(crlf.fields?.keywords, ["a", "b"]);
 assert.equal(ok.fields?.link, "https://www.figma.com/design/abc");
 
 assert.match(parseDesignMd("nama: x", "c.md").errors[0], /Front matter/);
-assert.match(parseDesignMd("---\nnama: x\n", "c.md").errors[0], /Penutup/);
+assert.match(parseDesignMd("---\nnama: x\n", "c.md").errors[0], /closing/);
 assert.ok(parseDesignMd("---\nnama: x\n---", "d.md").errors.length >= 4);
 assert.ok(parseDesignMd(TEMPLATE.replace("https://", "ftp://"), "e.md").errors.some((e) => e.includes("link")));
 assert.ok(parseDesignMd(TEMPLATE.replace("w: 16", "w: 1.5"), "f.md").errors.some((e) => e.startsWith("w ")));
-const warn = parseDesignMd(TEMPLATE.replace("---\nCatatan", "id: 9\nfoo: 1\ncategory: Lain\n---\nCatatan"), "g.md");
+const warn = parseDesignMd(TEMPLATE.replace("---\nDesign notes", "id: 9\nfoo: 1\ncategory: Lain\n---\nDesign notes"), "g.md");
 assert.ok(warn.errors.some((e) => e.includes("duplicate")));
 const warn2 = parseDesignMd(TEMPLATE.replace("w: 16", "id: 9\nfoo: 1").replace("category: Courses", "category: Lain"), "g.md");
 assert.deepEqual(warn2.errors, []);

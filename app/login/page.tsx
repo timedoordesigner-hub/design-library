@@ -48,17 +48,17 @@ export default function LoginPage() {
             <Image className="login-logo" src={logo} alt="Timedoor Academy" width={2000} height={520} priority />
             <span className="login-tag">Design Library</span>
           </div>
-          <h1 id="login-title">Halo, selamat datang!</h1>
+          <h1 id="login-title">Hello, welcome!</h1>
           <p className="login-sub">Search and view all Timedoor Academy design files.</p>
 
-          <Link href="/" className="login-cta" onClick={enter}>Lanjut sebagai viewer</Link>
+          <Link href="/" className="login-cta" onClick={enter}>Continue as viewer</Link>
 
           {adminOpen ? (
             <form className="login-admin" onSubmit={submit} noValidate>
-              <label className="form-label" htmlFor="password">Password admin</label>
+              <label className="form-label" htmlFor="password">Admin password</label>
               <div className="relative">
-                <input className="form-input !pr-11" id="password" name="password" type={show ? "text" : "password"} placeholder="Masukkan password" autoComplete="current-password" autoFocus aria-invalid={!!error} aria-describedby={error ? "login-error" : undefined} />
-                <button type="button" className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted" onClick={() => setShow((s) => !s)} aria-label={show ? "Sembunyikan password" : "Tampilkan password"} aria-pressed={show}>
+                <input className="form-input !pr-11" id="password" name="password" type={show ? "text" : "password"} placeholder="Enter password" autoComplete="current-password" autoFocus aria-invalid={!!error} aria-describedby={error ? "login-error" : undefined} />
+                <button type="button" className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted" onClick={() => setShow((s) => !s)} aria-label={show ? "Hide password" : "Show password"} aria-pressed={show}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
                     <circle cx="12" cy="12" r="3" />
