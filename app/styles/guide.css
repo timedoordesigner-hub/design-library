@@ -1105,8 +1105,8 @@ textarea.builder-input {
 
 .brief-doc-bg {
   min-height: 100vh;
-  background: #e6e8ec;
-  padding: 0 16px 48px;
+  background: #eef0f2;
+  padding: 0 16px 56px;
 }
 
 .brief-doc-bar {
@@ -1115,24 +1115,26 @@ textarea.builder-input {
   align-items: center;
   justify-content: space-between;
   margin: 0 auto;
-  padding: 16px 0;
+  padding: 14px 0;
   color: var(--muted);
-  font-size: 12px;
-  font-weight: 600;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
 }
 
 .brief-doc {
   max-width: 794px;
   min-height: 1123px;
   margin: 0 auto;
+  border-radius: 2px;
   background: #fff;
-  padding: 56px 64px;
-  box-shadow: 0 8px 30px rgb(46 38 61 / 14%);
+  padding: 58px 64px 48px;
+  box-shadow: 0 12px 34px rgb(46 38 61 / 12%);
 }
 
 .brief-doc header {
-  border-bottom: 3px solid var(--primary);
-  padding-bottom: 20px;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 22px;
 }
 
 .brief-doc-brand {
@@ -1153,50 +1155,59 @@ textarea.builder-input {
 }
 
 .brief-doc h1 {
-  margin: 4px 0 0;
-  font-size: 30px;
-  letter-spacing: -0.04em;
+  margin: 6px 0 0;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -0.045em;
 }
 
 .brief-doc header p:last-child {
-  margin: 8px 0 0;
+  max-width: 470px;
+  margin: 10px 0 0;
   color: var(--muted);
   font-size: 12px;
+  line-height: 1.6;
 }
 
 .brief-doc dl {
-  margin: 8px 0 0;
+  margin: 22px 0 0;
 }
 
 .brief-doc dl > div {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 24px;
   border-bottom: 1px solid var(--line);
-  padding: 14px 0;
+  padding: 15px 0;
   break-inside: avoid;
 }
 
 .brief-doc dt {
+  padding-top: 1px;
   color: var(--muted);
-  font-size: 11px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .brief-doc dd {
+  max-width: 470px;
   margin: 0;
   font-size: 12px;
-  line-height: 1.7;
+  line-height: 1.75;
   overflow-wrap: anywhere;
   white-space: pre-line;
 }
 
 .brief-doc-note {
-  margin-top: 28px;
-  border: 1px solid var(--primary);
+  margin-top: 32px;
+  border: 1px solid rgb(16 175 19 / 45%);
+  border-top: 3px solid var(--primary);
   border-radius: 8px;
-  background: var(--primary-soft);
-  padding: 18px 20px;
+  background: #f6fff6;
+  padding: 20px 22px;
   break-inside: avoid;
 }
 
@@ -1232,8 +1243,8 @@ textarea.builder-input {
 
 .brief-doc-note-points {
   display: grid;
-  gap: 6px;
-  margin: 16px 0 0;
+  gap: 8px;
+  margin: 18px 0 0;
   padding: 0;
   list-style: none;
   color: var(--muted);
@@ -1243,8 +1254,8 @@ textarea.builder-input {
 
 .brief-doc-note-points li {
   display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 8px;
+  grid-template-columns: 104px 1fr;
+  gap: 10px;
 }
 
 .brief-doc-note-points b {
@@ -1290,9 +1301,13 @@ textarea.builder-input {
 }
 
 .brief-doc footer {
-  margin-top: 40px;
+  margin-top: 42px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
   color: var(--muted-soft);
-  font-size: 10px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.03em;
 }
 
 @media print {
