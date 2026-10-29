@@ -1082,25 +1082,129 @@ textarea.builder-input {
 
 .guide-faq {
   display: grid;
-  gap: 8px;
-  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
 }
 
 .guide-faq details {
-  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0;
 }
 
-.guide-faq details[open] {
-  padding-bottom: 0;
+.guide-faq details:last-child {
+  border-bottom: 0;
+}
+
+.guide-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  list-style: none;
+  padding: 17px 20px;
+  font-size: 13px;
+}
+
+.guide-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-faq summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform 150ms ease;
+}
+
+.guide-faq summary:hover {
+  background: var(--canvas);
+}
+
+.guide-faq details[open] summary::after {
+  transform: rotate(-135deg);
 }
 
 .guide-faq p {
-  margin: 12px -16px 0;
-  border-top: 1px solid var(--line);
-  padding: 12px 16px 14px;
+  margin: 0;
+  max-width: 680px;
+  padding: 0 20px 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.guide-roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-roles li {
+  border: 1px solid var(--line-strong);
+  border-top: 3px solid var(--primary);
+  border-radius: 9px;
+  background: var(--surface);
+  padding: 18px 20px 22px;
+}
+
+.guide-roles .guide-role-admin {
+  border-top-color: var(--warning);
+}
+
+.guide-roles .guide-role-design {
+  border-top-color: var(--info);
+}
+
+.guide-roles span {
+  color: var(--muted-soft);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+}
+
+.guide-roles strong {
+  display: block;
+  margin-top: 14px;
+  font-size: 15px;
+}
+
+.guide-roles p {
+  margin: 7px 0 0;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.7;
+}
+
+.guide-help-cta {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 36px;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  background: var(--primary-soft);
+  padding: 20px 24px;
+}
+
+.guide-help-cta strong {
+  font-size: 15px;
+}
+
+.guide-help-cta p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 @media (max-width: 760px) {
@@ -1108,8 +1212,13 @@ textarea.builder-input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .guide-notion-card {
+  .guide-notion-card,
+  .guide-roles {
     grid-template-columns: 1fr;
+  }
+
+  .guide-help-cta {
+    display: grid;
   }
 
   .guide-steps,

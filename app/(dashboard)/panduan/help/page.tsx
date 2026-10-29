@@ -1,12 +1,12 @@
 const roles = [
-  ["Requester", "Provides accurate information in the team spreadsheet."],
-  ["Admin", "Checks scope and priority."],
-  ["Design team", "Creates the asset and updates the status."],
+  ["01", "Requester", "Writes the request in the team spreadsheet with complete, accurate details.", "guide-role-requester"],
+  ["02", "Admin", "Reviews the scope, priority, and readiness before it enters the queue.", "guide-role-admin"],
+  ["03", "Design team", "Creates the asset, asks questions when needed, and updates the status.", "guide-role-design"],
 ];
 
 const faqs = [
-  ["Why was my request returned?", "The brief may have no direction, missing information, poor source material, or a task you can do yourself. Complete the form and resend it."],
-  ["What if the request is last-minute?", "Submit it through the same process, include the deadline and the reason, and check Design Pool for an asset you can adapt."],
+  ["Why was my request returned?", "The brief may be missing direction, required information, usable source material, or may be a task you can complete yourself. Update the spreadsheet row, then resend the request."],
+  ["What if the request is last-minute?", "Use the same process. Include the real deadline and reason, then check the Design Library for an asset you can adapt."],
   ["What if the requirements change?", "Update your team spreadsheet and follow up in WhatsApp. Do not change the brief silently or message the designer personally."],
 ];
 
@@ -19,16 +19,17 @@ export default function GuideHelpPage() {
       </section>
 
       <h3 className="guide-heading">Who does what</h3>
-      <div className="guide-cards guide-cards-3">
-        {roles.map(([name, text]) => (
-          <div key={name} className="guide-card">
+      <ol className="guide-roles">
+        {roles.map(([number, name, text, tone]) => (
+          <li key={name} className={tone}>
+            <span>{number}</span>
             <strong>{name}</strong>
             <p>{text}</p>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
 
-      <h3 className="guide-heading">FAQ</h3>
+      <h3 className="guide-heading">Common questions</h3>
       <div className="guide-faq">
         {faqs.map(([question, answer]) => (
           <details key={question}>
@@ -38,9 +39,11 @@ export default function GuideHelpPage() {
         ))}
       </div>
 
-      <div className="guide-cta">
-        <strong>Still stuck?</strong>
-        <p>Ask the design team directly on WhatsApp: +62 831-9718-6360.</p>
+      <div className="guide-help-cta">
+        <div>
+          <strong>Still need help?</strong>
+          <p>Ask the design team directly on WhatsApp.</p>
+        </div>
         <a href="https://wa.me/6283197186360" target="_blank" rel="noreferrer" className="primary-button">Chat on WhatsApp <span aria-hidden="true">↗</span></a>
       </div>
     </>
