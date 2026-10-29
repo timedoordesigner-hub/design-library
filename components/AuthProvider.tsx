@@ -15,7 +15,7 @@ type AuthValue = {
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "";
 
-// Role dibaca dari app_metadata (hanya bisa diubah server/SQL). UI hanya cermin; RLS yang menegakkan.
+// Role comes from app_metadata (server/SQL only). UI mirrors it; RLS enforces access.
 const roleOf = (session: Session | null): Role => (session?.user.app_metadata?.role === "admin" ? "admin" : "viewer");
 
 const AuthContext = createContext<AuthValue>({ role: "viewer", isAdmin: false, ready: false, signIn: async () => "Not ready yet.", signOut: async () => undefined });

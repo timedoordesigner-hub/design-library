@@ -20,7 +20,7 @@ assert.ok(parseDesignMd("---\nnama: x\n---", "d.md").errors.length >= 4);
 assert.ok(parseDesignMd(TEMPLATE.replace("https://", "ftp://"), "e.md").errors.some((e) => e.includes("link")));
 assert.ok(parseDesignMd(TEMPLATE.replace("w: 16", "w: 1.5"), "f.md").errors.some((e) => e.startsWith("w ")));
 const warn = parseDesignMd(TEMPLATE.replace("---\nCatatan", "id: 9\nfoo: 1\ncategory: Lain\n---\nCatatan"), "g.md");
-assert.ok(warn.errors.some((e) => e.includes("duplikat")));
+assert.ok(warn.errors.some((e) => e.includes("duplicate")));
 const warn2 = parseDesignMd(TEMPLATE.replace("w: 16", "id: 9\nfoo: 1").replace("category: Courses", "category: Lain"), "g.md");
 assert.deepEqual(warn2.errors, []);
 assert.equal(warn2.warnings.length, 3);

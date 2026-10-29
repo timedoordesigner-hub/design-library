@@ -51,13 +51,13 @@ export function Viewer({ designs, activeId, onClose, onNavigate, onDelete }: Pro
         <div className="viewer-main flex min-h-0 flex-1 flex-col">
           <div className="viewer-canvas relative flex min-h-[42vh] flex-1 items-center justify-center p-5 sm:min-h-0 sm:p-10">
             <div className="w-full max-w-3xl"><Thumb design={design} /></div>
-            <button className="viewer-close absolute right-3 top-3 h-8 w-8 text-lg leading-none" ref={closeRef} onClick={onClose} aria-label="Tutup viewer">×</button>
-            <button className="viewer-nav viewer-nav-left" onClick={() => activeIndex > 0 && onNavigate(designs[activeIndex - 1].id)} disabled={activeIndex <= 0} aria-label="Design sebelumnya">←</button>
-            <button className="viewer-nav viewer-nav-right" onClick={() => activeIndex < designs.length - 1 && onNavigate(designs[activeIndex + 1].id)} disabled={activeIndex >= designs.length - 1} aria-label="Design berikutnya">→</button>
+            <button className="viewer-close absolute right-3 top-3 h-8 w-8 text-lg leading-none" ref={closeRef} onClick={onClose} aria-label="Close viewer">×</button>
+            <button className="viewer-nav viewer-nav-left" onClick={() => activeIndex > 0 && onNavigate(designs[activeIndex - 1].id)} disabled={activeIndex <= 0} aria-label="Previous design">←</button>
+            <button className="viewer-nav viewer-nav-right" onClick={() => activeIndex < designs.length - 1 && onNavigate(designs[activeIndex + 1].id)} disabled={activeIndex >= designs.length - 1} aria-label="Next design">→</button>
           </div>
           {similar.length > 0 && (
             <section className="viewer-similar-bar" aria-labelledby="similar-title">
-              <h3 id="similar-title" className="viewer-label">Design serupa</h3>
+              <h3 id="similar-title" className="viewer-label">Similar designs</h3>
               <ul className="viewer-similar">
                 {similar.map((item) => (
                   <li key={item.id}>
@@ -80,9 +80,9 @@ export function Viewer({ designs, activeId, onClose, onNavigate, onDelete }: Pro
             <div><dt className="viewer-label">Preview</dt><dd className="mt-1 break-words text-xs text-muted">{design.preview || "—"}</dd></div>
           </dl>
           <div className="mt-10 flex flex-wrap items-center gap-2">
-          {design.link && <a href={design.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-sm bg-primary px-3 py-2 text-xs font-medium text-white hover:bg-primary-dark">Buka di Figma <span aria-hidden="true">↗</span></a>}
+          {design.link && <a href={design.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-sm bg-primary px-3 py-2 text-xs font-medium text-white hover:bg-primary-dark">Open in Figma <span aria-hidden="true">↗</span></a>}
           {isAdmin && <Link href={`/edit/${design.id}`} className="viewer-action viewer-action-edit"><PencilIcon />Edit</Link>}
-          {isAdmin && onDelete && <button type="button" className="viewer-action viewer-action-delete" onClick={() => onDelete(design)}><TrashIcon />Hapus</button>}
+          {isAdmin && onDelete && <button type="button" className="viewer-action viewer-action-delete" onClick={() => onDelete(design)}><TrashIcon />Delete</button>}
         </div>
         </aside>
       </div>

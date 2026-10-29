@@ -15,7 +15,7 @@ export function Topbar({ onMenu }: Props) {
   const query = parseQuery(new URLSearchParams(searchParams.toString()));
   const searchRef = useRef<HTMLInputElement>(null);
   const { isAdmin } = useAuth();
-  const title = pathname === "/tambah" ? "Add File" : pathname.startsWith("/panduan") ? "Request Guide" : pathname === "/thumbnail" ? "Design Library" : pathname === "/library" ? "Manage Library" : pathname.startsWith("/edit/") ? "Edit File" : "Search";
+  const title = pathname === "/tambah" || pathname === "/impor" ? "Upload" : pathname.startsWith("/panduan") ? "Request Guide" : pathname === "/thumbnail" ? "Design Library" : pathname === "/library" ? "Manage Library" : pathname.startsWith("/edit/") ? "Edit File" : "Search";
 
   const updateSearch = (value: string) => {
     const next = { ...query, q: value };

@@ -25,7 +25,7 @@ export default function LoginPage() {
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const password = String(new FormData(event.currentTarget).get("password") || "");
-    if (!password) return setError("Password wajib diisi.");
+    if (!password) return setError("Password is required.");
     setBusy(true);
     const failure = await signIn(password);
     if (failure) {
@@ -39,7 +39,7 @@ export default function LoginPage() {
   return (
     <main className="login-page">
       <div className="login-stage">
-        {/* Cobee: PNG 960x960 dengan ruang kosong; dipotong lewat CSS (.login-mascot). */}
+        {/* Cobee: PNG 960x960 with empty space; cropped via CSS (.login-mascot). */}
         <div className="login-mascot">
           <Image src={cobee} alt="" width={960} height={960} priority />
         </div>
@@ -49,7 +49,7 @@ export default function LoginPage() {
             <span className="login-tag">Design Library</span>
           </div>
           <h1 id="login-title">Halo, selamat datang!</h1>
-          <p className="login-sub">Cari dan lihat semua file design Timedor Academy.</p>
+          <p className="login-sub">Search and view all Timedoor Academy design files.</p>
 
           <Link href="/" className="login-cta" onClick={enter}>Lanjut sebagai viewer</Link>
 
@@ -67,11 +67,11 @@ export default function LoginPage() {
                 </button>
               </div>
               {error && <p className="form-error mt-2" id="login-error" role="alert">{error}</p>}
-              <button className="login-admin-submit" type="submit" disabled={busy}>{busy ? "Memeriksa…" : "Masuk sebagai admin"}</button>
-              <button className="login-toggle" type="button" onClick={() => { setAdminOpen(false); setError(""); }}>Batal</button>
+              <button className="login-admin-submit" type="submit" disabled={busy}>{busy ? "Checking…" : "Sign in as admin"}</button>
+              <button className="login-toggle" type="button" onClick={() => { setAdminOpen(false); setError(""); }}>Cancel</button>
             </form>
           ) : (
-            <button className="login-toggle" type="button" onClick={() => setAdminOpen(true)} aria-expanded={false}>Admin? Masuk dengan password</button>
+            <button className="login-toggle" type="button" onClick={() => setAdminOpen(true)} aria-expanded={false}>Admin? Sign in with password</button>
           )}
         </section>
       </div>

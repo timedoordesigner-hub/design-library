@@ -35,28 +35,28 @@ export function parseDesignMd(text: string, file: string): ParsedMd {
   const fail = (message: string): ParsedMd => ({ file, errors: [...errors, message], warnings });
 
   const lines = text.replace(/^﻿/, "").replace(/\r\n?/g, "\n").split("\n");
-  if (lines[0]?.trim() !== "---") return fail("Front matter tidak ditemukan (baris pertama harus ---).");
+  if (lines[0]?.trim() !== "---") return fail("Front matter not found (the first line must be ---).");
   const end = lines.findIndex((line, i) => i > 0 && line.trim() === "---");
-  if (end < 0) return fail("Penutup front matter --- tidak ditemukan.");
+  if (end < 0) return fail("Front matter closing marker --- not found.");
 
   const raw: Record<string, string> = {};
   lines.slice(1, end).forEach((line, i) => {
     if (!line.trim() || line.trimStart().startsWith("#")) return;
     const colon = line.indexOf(":");
-    if (colon < 1) return void errors.push(`Baris ${i + 2}: format harus "key: value".`);
+    if (colon < 1) return void errors.push(`Baris ${i + 2}: format must be "key: value".`);
     const key = line.slice(0, colon).trim();
-    if (key in raw) return void errors.push(`Baris ${i + 2}: key "${key}" duplikat.`);
+    if (key in raw) return void errors.push(`Line ${i + 2}: duplicate key "${key}".`);
     raw[key] = unquote(line.slice(colon + 1).trim());
-    if (key === "id" || key === "image") warnings.push(`"${key}" diabaikan.`);
-    else if (!KNOWN.includes(key)) warnings.push(`Key "${key}" tidak dikenal, diabaikan.`);
+    if (key === "id" || key === "image") warnings.push(`"${key}" is ignored.`);
+    else if (!KNOWN.includes(key)) warnings.push(`Unknown key "${key}", ignored.`);
   });
 
   const sourceNo = positiveInt(raw.sourceNo ?? "");
-  if (sourceNo === undefined) errors.push("sourceNo wajib berupa bilangan bulat positif.");
+  if (sourceNo === undefined) errors.push("sourceNo must be a positive whole number.");
   (["nama", "category", "subCategory", "tipe"] as const).forEach((key) => {
-    if (!raw[key]) errors.push(`${key} wajib diisi.`);
+    if (!raw[key]) errors.push(`${key} is required.`);
   });
-  if (raw.link && !validUrl(raw.link)) errors.push("link harus diawali http:// atau https://.");
+  if (raw.link && !validUrl(raw.link)) errors.push("link must start with http:// or https://.");
   const dims: Record<"w" | "h", number | undefined> = { w: undefined, h: undefined };
   (["w", "h"] as const).forEach((key) => {
     if (!raw[key]) return;
@@ -101,11 +101,11 @@ export function planImport(parsed: ParsedMd[], existing: Design[], overwrite: bo
     const { file, fields } = row;
     const messages = [...row.errors, ...row.warnings];
     if (!fields || row.errors.length) return { file, status: "error", messages, fields };
-    if (seen.has(fields.sourceNo)) return { file, status: "error", messages: [`No ${fields.sourceNo} duplikat di batch (file pertama dipakai).`, ...messages], fields };
+    if (seen.has(fields.sourceNo)) return { file, status: "error", messages: [`Duplicate No. ${fields.sourceNo} in this batch (first file used).`, ...messages], fields };
     seen.add(fields.sourceNo);
 
     const old = bySource.get(fields.sourceNo);
-    if (old && !overwrite) return { file, status: "skip", messages: ["Sudah ada di library, dilewati.", ...messages], fields };
+    if (old && !overwrite) return { file, status: "skip", messages: ["Already in the library, skipped.", ...messages], fields };
     const { w, h, image, ...rest } = fields;
     if (old) {
       return { file, status: "update", messages, fields, design: { ...old, ...rest, preview: fields.preview || old.preview, image: image || old.image, w: w ?? old.w, h: h ?? old.h } };

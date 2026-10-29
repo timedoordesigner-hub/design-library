@@ -38,9 +38,9 @@ export function DesignForm({ id }: { id?: number }) {
     return (
       <div className="content-inner pb-16 pt-7">
         <div className="empty-state px-6 py-20 text-center">
-          <p className="text-base font-medium">File tidak ditemukan.</p>
-          <p className="mt-1 text-[13px] text-muted">File mungkin sudah dihapus.</p>
-          <Link href="/library" className="primary-button mt-5 inline-flex">Kembali ke Library</Link>
+          <p className="text-base font-medium">File not found.</p>
+          <p className="mt-1 text-[13px] text-muted">This file may have been deleted.</p>
+          <Link href="/library" className="primary-button mt-5 inline-flex">Back to library</Link>
         </div>
       </div>
     );
@@ -86,14 +86,14 @@ function FormBody({ existing }: { existing?: Design }) {
 
   const takeFile = async (file: File | undefined) => {
     if (!file) return;
-    if (!(file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/webp")) return setErrors((e) => ({ ...e, image: "File harus PNG, JPG, atau WebP." }));
-    if (file.size > MAX_BYTES) return setErrors((e) => ({ ...e, image: "Ukuran gambar maksimal 5 MB." }));
+    if (!(file.type === "image/png" || file.type === "image/jpeg" || file.type === "image/webp")) return setErrors((e) => ({ ...e, image: "File must be PNG, JPG, or WebP." }));
+    if (file.size > MAX_BYTES) return setErrors((e) => ({ ...e, image: "Image size must be 5 MB or less." }));
     try {
       const result = await readImage(file);
       setImage({ ...result, name: file.name, file });
       setErrors((e) => ({ ...e, image: undefined }));
     } catch {
-      setErrors((e) => ({ ...e, image: "Gambar tidak bisa dibaca. Coba file lain." }));
+      setErrors((e) => ({ ...e, image: "Image could not be read. Try another file." }));
     }
   };
 
@@ -107,12 +107,12 @@ function FormBody({ existing }: { existing?: Design }) {
     event.preventDefault();
     const no = Number(sourceNo);
     const next: Errors = {};
-    if (!nama.trim()) next.nama = "Nama file wajib diisi.";
-    if (!category) next.category = "Category wajib dipilih.";
-    if (!tipe) next.tipe = "Media type wajib dipilih.";
-    if (!Number.isInteger(no) || no < 1) next.sourceNo = "No harus bilangan bulat positif.";
-    else if (designs.some((d) => d.sourceNo === no && d.id !== existing?.id)) next.sourceNo = "No ini sudah dipakai file lain.";
-    if (link.trim() && !validUrl(link.trim())) next.link = "Link harus diawali http:// atau https://.";
+    if (!nama.trim()) next.nama = "File name is required.";
+    if (!category) next.category = "Category is required.";
+    if (!tipe) next.tipe = "Media type is required.";
+    if (!Number.isInteger(no) || no < 1) next.sourceNo = "No. must be a positive whole number.";
+    else if (designs.some((d) => d.sourceNo === no && d.id !== existing?.id)) next.sourceNo = "This No. is already used by another file.";
+    if (link.trim() && !validUrl(link.trim())) next.link = "Link must start with http:// or https://.";
     if (errors.image) next.image = errors.image;
     setErrors(next);
     if (Object.keys(next).length) {
@@ -125,7 +125,7 @@ function FormBody({ existing }: { existing?: Design }) {
       sourceNo: no,
       nama: nama.trim(),
       category,
-      subCategory: existing?.subCategory ?? "-", // ponytail: kolom DB masih ada; UI tidak memakainya lagi
+      subCategory: existing?.subCategory ?? "-", // ponytail: DB column still exists; UI no longer uses it
       tipe,
       link: link.trim(),
       keywords: keywords.split(",").map((k) => k.trim()).filter(Boolean),
@@ -144,12 +144,12 @@ function FormBody({ existing }: { existing?: Design }) {
       }
       if (existing) await update(existing.id, fields);
       else await add(fields);
-      showToast(existing ? "Perubahan disimpan." : "File ditambahkan.");
+      showToast(existing ? "Changes saved." : "File added.");
       router.push("/library");
     } catch {
       setSaving(false);
       void removePreview(uploaded);
-      showToast("Gagal menyimpan. Periksa koneksi atau login admin lalu coba lagi.", "error");
+      showToast("Could not save. Check your connection or admin login, then try again.", "error");
     }
   };
 
@@ -158,14 +158,14 @@ function FormBody({ existing }: { existing?: Design }) {
 
   return (
     <main className="content-inner pb-16 pt-7">
-      <p className="eyebrow">{existing ? "Edit file" : "Tambah file"}</p>
-      <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">{existing ? "Edit design asset" : "Tambah design asset"}</h2>
-      <p className="mt-1 text-[13px] text-muted">{existing ? "Ubah data file lalu simpan." : "Upload satu file design. Tanda * wajib diisi."}</p>
+      <p className="eyebrow">{existing ? "Edit file" : "Add file"}</p>
+      <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">{existing ? "Edit design asset" : "Add design asset"}</h2>
+      <p className="mt-1 text-[13px] text-muted">{existing ? "Update the file details, then save." : "Upload one design file. Fields marked * are required."}</p>
 
       <form className="form-card mt-6" onSubmit={submit} noValidate>
         <div className="form-grid">
           <div className="form-col">
-            <span className="form-label" id="image-label">Gambar preview</span>
+            <span className="form-label" id="image-label">Preview image</span>
             <div
               className={`dropzone ${dragging ? "is-dragging" : ""} ${errors.image ? "has-error" : ""}`}
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -176,13 +176,13 @@ function FormBody({ existing }: { existing?: Design }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={image.url} alt={`Preview ${image.name}`} className="dropzone-img" />
               ) : (
-                <div className="dropzone-empty"><span className="dropzone-icon"><ImageIcon /></span><strong>Tarik gambar ke sini</strong><span>PNG, JPG, atau WebP · maks 5 MB</span></div>
+                <div className="dropzone-empty"><span className="dropzone-icon"><ImageIcon /></span><strong>Drop an image here</strong><span>PNG, JPG, or WebP · max 5 MB</span></div>
               )}
             </div>
             <input ref={fileRef} id="field-image" className="sr-only" type="file" accept="image/*" aria-labelledby="image-label" onChange={(e) => { void takeFile(e.target.files?.[0]); e.target.value = ""; }} />
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <button type="button" className="control-button" onClick={() => fileRef.current?.click()}>{image ? "Ganti gambar" : "Pilih gambar"}</button>
-              {image && <button type="button" className="control-button" onClick={() => setImage(null)}>Hapus gambar</button>}
+              <button type="button" className="control-button" onClick={() => fileRef.current?.click()}>{image ? "Replace image" : "Choose image"}</button>
+              {image && <button type="button" className="control-button" onClick={() => setImage(null)}>Remove image</button>}
             </div>
             {image && <p className="mt-2 break-all text-[11px] text-muted">{image.name} · {image.w}×{image.h}</p>}
             {err("image")}
@@ -190,15 +190,15 @@ function FormBody({ existing }: { existing?: Design }) {
 
           <div className="form-col">
             <div className="form-field">
-              <label className="form-label" htmlFor="field-nama">Nama file *</label>
-              <input id="field-nama" className="form-input" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Mis. Poster Webinar Figma" {...aria("nama")} />
+              <label className="form-label" htmlFor="field-nama">File name *</label>
+              <input id="field-nama" className="form-input" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="E.g. Figma webinar poster" {...aria("nama")} />
               {err("nama")}
             </div>
             <div className="form-row">
               <div className="form-field">
                 <label className="form-label" htmlFor="field-category">Category *</label>
                 <select id="field-category" className="form-input" value={category} onChange={(e) => setCategory(e.target.value)} {...aria("category")}>
-                  <option value="">Pilih category</option>
+                  <option value="">Select category</option>
                   {categoryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
                 {err("category")}
@@ -207,7 +207,7 @@ function FormBody({ existing }: { existing?: Design }) {
             <div className="form-field">
               <label className="form-label" htmlFor="field-tipe">Media type *</label>
               <select id="field-tipe" className="form-input" value={tipe} onChange={(e) => setTipe(e.target.value)} {...aria("tipe")}>
-                <option value="">Pilih media type</option>
+                <option value="">Select media type</option>
                 {mediaGroups.map(([letter, types]) => <optgroup key={letter} label={letter}>{types.map((t) => <option key={t} value={t}>{t}</option>)}</optgroup>)}
               </select>
               {err("tipe")}
@@ -222,9 +222,9 @@ function FormBody({ existing }: { existing?: Design }) {
                 <div className="label-row">
                   <label className="form-label" htmlFor="field-sourceNo">No</label>
                   {!existing && (
-                    <span className="info-tip" tabIndex={0} role="button" aria-label="Informasi nomor otomatis">
+                    <span className="info-tip" tabIndex={0} role="button" aria-label="About automatic numbering">
                       <InfoIcon />
-                      <span className="info-tip-popup" role="tooltip">Nomor otomatis sesuai jumlah design.</span>
+                      <span className="info-tip-popup" role="tooltip">Numbered automatically based on the number of designs.</span>
                     </span>
                   )}
                 </div>
@@ -234,7 +234,7 @@ function FormBody({ existing }: { existing?: Design }) {
             </div>
             <div className="form-field">
               <label className="form-label" htmlFor="field-keywords">Keyword</label>
-              <input id="field-keywords" className="form-input" value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="Pisahkan dengan koma: poster, webinar" />
+              <input id="field-keywords" className="form-input" value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="Separate with commas: poster, webinar" />
             </div>
             <div className="form-field">
               <label className="form-label" htmlFor="field-note">Note</label>
@@ -243,8 +243,8 @@ function FormBody({ existing }: { existing?: Design }) {
           </div>
         </div>
         <div className="form-actions">
-          <Link href="/library" className="control-button inline-flex items-center">Batal</Link>
-          <button type="submit" className="primary-button" disabled={saving}>{saving ? "Menyimpan…" : existing ? "Simpan perubahan" : "Simpan file"}</button>
+          <Link href="/library" className="control-button inline-flex items-center">Cancel</Link>
+          <button type="submit" className="primary-button" disabled={saving}>{saving ? "Saving…" : existing ? "Save changes" : "Save file"}</button>
         </div>
       </form>
     </main>

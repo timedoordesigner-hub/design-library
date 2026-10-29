@@ -70,8 +70,8 @@ export async function updateDesign(id: number, fields: DesignFields): Promise<De
   return fromRow(data as Row);
 }
 
-// Satu statement = atomik. Konflik pada source_no -> update baris yang ada.
-// Dipecah per 100 baris (batas body request). Tiap chunk atomik; antar chunk tidak, tapi upsert aman diulang.
+// One statement is atomic. A source_no conflict updates the existing row.
+// Split into chunks of 100 rows (request body limit). Each chunk is atomic; retrying the upsert is safe.
 export async function upsertDesigns(items: DesignFields[]): Promise<Design[]> {
   const saved: Design[] = [];
   for (let i = 0; i < items.length; i += 100) {
@@ -87,7 +87,7 @@ export async function deleteDesign(id: number): Promise<void> {
   if (error) throw error;
 }
 
-// Hapus semua baris (per 100 id), lalu best-effort hapus gambar upload di Storage. RLS admin menegakkan hak.
+// Delete all rows (100 ids per batch), then best-effort delete uploaded images from Storage. RLS enforces admin access.
 export async function deleteAllDesigns(): Promise<number> {
   const items = await getDesigns();
   for (let i = 0; i < items.length; i += 100) {
@@ -106,7 +106,7 @@ export async function uploadPreview(file: File): Promise<string> {
   return supabase().storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
-// Best effort: baris DB sudah benar walau objek yatim tersisa.
+// Best effort: DB rows remain correct even if orphaned objects remain.
 export async function removePreview(url: string | undefined): Promise<void> {
   const marker = `/${BUCKET}/`;
   const at = url?.indexOf(marker) ?? -1;

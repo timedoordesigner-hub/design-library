@@ -17,25 +17,25 @@ export function driveThumb(value: string): string {
 function parseRow(raw: unknown, file: string): ParsedMd {
   const errors: string[] = [];
   const warnings: string[] = [];
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { file, errors: ["Baris harus berupa objek."], warnings };
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { file, errors: ["Each row must be an object."], warnings };
   const r = raw as Record<string, unknown>;
 
   const no = str(r.sourceNo);
   const sourceNo = /^\d+$/.test(no) && Number(no) > 0 ? Number(no) : undefined;
-  if (sourceNo === undefined) errors.push("sourceNo wajib berupa bilangan bulat positif.");
+  if (sourceNo === undefined) errors.push("sourceNo must be a positive whole number.");
   const nama = str(r.nama);
   const category = str(r.category);
   const tipe = str(r.tipe);
-  if (!nama) errors.push("nama wajib diisi.");
-  if (!category) errors.push("category wajib diisi.");
-  if (!tipe) errors.push("tipe wajib diisi.");
+  if (!nama) errors.push("nama is required.");
+  if (!category) errors.push("category is required.");
+  if (!tipe) errors.push("tipe is required.");
   const link = str(r.link);
-  if (link && !validUrl(link)) errors.push("link harus diawali http:// atau https://.");
+  if (link && !validUrl(link)) errors.push("link must start with http:// or https://.");
   if (errors.length) return { file, errors, warnings };
 
   const rawImage = str(r.image);
   const image = driveThumb(rawImage);
-  if (rawImage && !image) warnings.push("image bukan URL valid, diabaikan.");
+  if (rawImage && !image) warnings.push("image is not a valid URL and was ignored.");
 
   const dim = (v: unknown) => { const s = str(v); return /^\d+$/.test(s) && Number(s) > 0 ? Number(s) : undefined; };
   const keywords = (Array.isArray(r.keywords) ? r.keywords.map(str) : str(r.keywords).split(",").map((k) => k.trim())).filter(Boolean);
@@ -64,7 +64,7 @@ function parseRow(raw: unknown, file: string): ParsedMd {
 export function parseSpreadsheetJson(text: string, file: string): ParsedMd[] {
   let data: unknown;
   try { data = JSON.parse(text.replace(/^﻿/, "")); }
-  catch { return [{ file, errors: ["JSON tidak valid."], warnings: [] }]; }
-  if (!Array.isArray(data)) return [{ file, errors: ["JSON harus berupa array baris."], warnings: [] }];
+  catch { return [{ file, errors: ["Invalid JSON."], warnings: [] }]; }
+  if (!Array.isArray(data)) return [{ file, errors: ["JSON must be an array of rows."], warnings: [] }];
   return data.map((row, i) => parseRow(row, `${file} #${i + 1}`));
 }

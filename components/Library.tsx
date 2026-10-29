@@ -60,9 +60,9 @@ export function Library() {
     try {
       await remove(target.id);
       if (query.id === target.id) update({ id: null });
-      showToast(`“${target.nama}” dihapus.`);
+      showToast(`“${target.nama}” deleted.`);
     } catch {
-      showToast("Gagal menghapus file.", "error");
+      showToast("Could not delete the file.", "error");
     }
   };
 
@@ -78,34 +78,34 @@ export function Library() {
           <div>
             <p className="eyebrow">All files</p>
             <h2 className="mt-2 text-xl font-semibold tracking-[-0.02em]">Design assets</h2>
-            <p className="mt-1 text-[13px] text-muted">Temukan, lihat, dan kelola file design Timedor Academy.</p>
+            <p className="mt-1 text-[13px] text-muted">Find, view, and manage Timedoor Academy design files.</p>
           </div>
-          {isAdmin && <Link href="/tambah" className="primary-button"><PlusIcon />Tambah file</Link>}
+          {isAdmin && <Link href="/tambah" className="primary-button"><PlusIcon />Add file</Link>}
         </section>
-        {error && <p className="notice notice-warning mt-4" role="alert">{error} Data baru tidak akan tersimpan.</p>}
-        <section className="stat-row mt-6" aria-label="Ringkasan library">
-          <div className="stat-card stat-green"><span className="eyebrow">Total file</span><strong>{designs.length}</strong><span className="stat-caption">file terdaftar</span></div>
-          <div className="stat-card stat-blue"><span className="eyebrow">Category</span><strong>{categories.length}</strong><span className="stat-caption">kategori terdaftar</span></div>
-          <div className="stat-card stat-orange"><span className="eyebrow">Media type</span><strong>{tipes.length}</strong><span className="stat-caption">jenis media</span></div>
+        {error && <p className="notice notice-warning mt-4" role="alert">{error} New data will not be saved.</p>}
+        <section className="stat-row mt-6" aria-label="Library summary">
+          <div className="stat-card stat-green"><span className="eyebrow">Total file</span><strong>{designs.length}</strong><span className="stat-caption">files in library</span></div>
+          <div className="stat-card stat-blue"><span className="eyebrow">Category</span><strong>{categories.length}</strong><span className="stat-caption">categories in use</span></div>
+          <div className="stat-card stat-orange"><span className="eyebrow">Media type</span><strong>{tipes.length}</strong><span className="stat-caption">media types in use</span></div>
         </section>
         <div className="toolbar mt-7 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <button className={`control-button ${filterOpen || hasFilters ? "active" : ""}`} onClick={() => setFilterOpen(!filterOpen)} aria-expanded={filterOpen}>
               Filter{hasFilters ? ` (${filterCount})` : ""}
             </button>
-            <p className="text-[13px] text-muted" aria-live="polite">{results.length} dari {designs.length} file</p>
+            <p className="text-[13px] text-muted" aria-live="polite">{results.length} of {designs.length} files</p>
           </div>
           <div className="toolbar-actions flex items-center gap-2">
-            <label className="sr-only" htmlFor="sort">Urutkan</label>
+            <label className="sr-only" htmlFor="sort">Sort by</label>
             <select id="sort" className="control-select" value={query.sort} onChange={(e) => update({ sort: e.target.value as SortKey })}>
-              <option value="no">Urut: Old / New </option>
-              <option value="nama">Urut: Nama</option>
-              <option value="category">Urut: Category</option>
-              <option value="tipe">Urut: Media type</option>
+              <option value="no">Sort: Date added</option>
+              <option value="nama">Sort: Name</option>
+              <option value="category">Sort: Category</option>
+              <option value="tipe">Sort: Media type</option>
             </select>
-            <button className="control-button" onClick={() => update({ dir: query.dir === "asc" ? "desc" : "asc" })} aria-label={query.dir === "asc" ? "Urutan naik, klik untuk turun" : "Urutan turun, klik untuk naik"}>{query.sort === "no" ? (query.dir === "asc" ? "Lama→Baru" : "Baru→Lama") : query.dir === "asc" ? "A→Z" : "Z→A"}</button>
-            <div className="flex items-center gap-2" role="group" aria-label="Tampilan">
-              <button className={`control-button view-button ${query.view === "list" ? "active" : ""}`} onClick={() => update({ view: "list" })} aria-pressed={query.view === "list"}>Tabel</button>
+            <button className="control-button" onClick={() => update({ dir: query.dir === "asc" ? "desc" : "asc" })} aria-label={query.dir === "asc" ? "Ascending, click for descending" : "Descending, click for ascending"}>{query.sort === "no" ? (query.dir === "asc" ? "Old → New" : "New → Old") : query.dir === "asc" ? "A→Z" : "Z→A"}</button>
+            <div className="flex items-center gap-2" role="group" aria-label="View">
+              <button className={`control-button view-button ${query.view === "list" ? "active" : ""}`} onClick={() => update({ view: "list" })} aria-pressed={query.view === "list"}>Table</button>
               <button className={`control-button view-button ${query.view === "grid" ? "active" : ""}`} onClick={() => update({ view: "grid" })} aria-pressed={query.view === "grid"}>Thumbnail</button>
             </div>
           </div>
@@ -115,23 +115,23 @@ export function Library() {
           <div className="filter-panel mt-3 grid gap-6 p-5">
             <FilterGroup label="Category" values={categories} selected={query.cat} onToggle={(v) => toggleValue("cat", v)} tone />
             <FilterGroup label="Media type" values={tipes} selected={query.tipe} onToggle={(v) => toggleValue("tipe", v)} />
-            {hasFilters && <button className="control-button w-fit" onClick={() => update({ cat: [], tipe: [] })}>Hapus filter</button>}
+            {hasFilters && <button className="control-button w-fit" onClick={() => update({ cat: [], tipe: [] })}>Clear filters</button>}
           </div>
         )}
 
         <div className="mt-4">
           {loading ? (
-            <div className="skeleton h-72" aria-label="Memuat data" />
+            <div className="skeleton h-72" aria-label="Loading data" />
           ) : designs.length === 0 ? (
             <div className="empty-state px-6 py-20 text-center">
-              <p className="text-base font-medium">Library masih kosong.</p>
-              <p className="mt-1 text-[13px] text-muted">{isAdmin ? "Mulai dengan menambahkan file design pertama." : "Belum ada file design yang ditambahkan."}</p>
-              {isAdmin && <Link href="/tambah" className="primary-button mt-5 inline-flex"><PlusIcon />Tambah file pertama</Link>}
+              <p className="text-base font-medium">The library is empty.</p>
+              <p className="mt-1 text-[13px] text-muted">{isAdmin ? "Start by adding the first design file." : "No design files have been added yet."}</p>
+              {isAdmin && <Link href="/tambah" className="primary-button mt-5 inline-flex"><PlusIcon />Add the first file</Link>}
             </div>
           ) : results.length === 0 ? (
             <div className="empty-state px-6 py-20 text-center">
-              <p className="text-base font-medium">{query.q ? `Tidak ada hasil untuk “${query.q}”.` : "Tidak ada file yang cocok."}</p>
-              <p className="mt-1 text-[13px] text-muted">Coba kata lain atau hapus filter.</p>
+              <p className="text-base font-medium">{query.q ? `No results for “${query.q}”.` : "No matching files."}</p>
+              <p className="mt-1 text-[13px] text-muted">Try another keyword or clear the filters.</p>
             </div>
           ) : query.view === "grid" ? (
             <CardGrid items={results} onOpen={openDesign} onDelete={isAdmin ? setPendingDelete : undefined} />
@@ -180,24 +180,24 @@ export function RowActions({ design, onDelete }: { design: Design; onDelete: Del
   return (
     <span className="row-actions" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
       <Link href={`/edit/${design.id}`} className="icon-button icon-edit" aria-label={`Edit ${design.nama}`} title="Edit"><PencilIcon /></Link>
-      <button type="button" className="icon-button icon-delete" aria-label={`Hapus ${design.nama}`} title="Hapus" onClick={() => onDelete(design)}><TrashIcon /></button>
+      <button type="button" className="icon-button icon-delete" aria-label={`Delete ${design.nama}`} title="Delete" onClick={() => onDelete(design)}><TrashIcon /></button>
     </span>
   );
 }
 
 function Table({ items, onOpen, onDelete }: { items: Design[]; onOpen: OpenHandler; onDelete?: DeleteHandler }) {
   return (
-    <div className={`data-table ${onDelete ? "" : "table-viewer"}`} role="table" aria-label="Daftar file design">
+    <div className={`data-table ${onDelete ? "" : "table-viewer"}`} role="table" aria-label="Design files">
       <div className="table-head" role="row">
         <span role="columnheader">No</span>
-        <span role="columnheader">Nama file</span>
+        <span role="columnheader">File name</span>
         <span role="columnheader">Category</span>
         <span role="columnheader">Media type</span>
         <span role="columnheader">Keyword</span>
         <span role="columnheader">Note</span>
         <span role="columnheader">Preview</span>
         <span role="columnheader">Link</span>
-        {onDelete && <span role="columnheader">Aksi</span>}
+        {onDelete && <span role="columnheader">Actions</span>}
       </div>
       {items.map((design) => (
         <div

@@ -71,7 +71,7 @@ export function DesignsProvider({ children }: { children: ReactNode }) {
     if (!isAdmin) throw new Error("Admin only.");
     const plan = planImport(rows, designs, overwrite);
     const items = plan.filter((row) => row.design && (row.status === "new" || row.status === "update")).map((row) => row.design as Design);
-    // id client diabaikan; konflik source_no -> update baris yang ada (atomik).
+    // Client id is ignored; source_no conflicts update the existing row atomically.
     const saved = await upsertDesigns(items);
     setDesigns((current) => {
       const nos = new Set(saved.map((item) => item.sourceNo));

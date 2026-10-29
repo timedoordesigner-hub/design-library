@@ -82,8 +82,8 @@ export function Gallery() {
                 value={query.dir}
                 onChange={(e) => update({ sort: "no", dir: e.target.value === "desc" ? "desc" : "asc" })}
               >
-                <option value="asc">Oldest to newest</option>
-                <option value="desc">Newest to oldest</option>
+                <option value="asc">Old → New</option>
+                <option value="desc">New → Old</option>
               </select>
             </div>
             <ul className="gallery-grid">
