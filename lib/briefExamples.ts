@@ -6,7 +6,10 @@ export type BriefExample = {
   docUrl: string;
 };
 
-export const briefExamples: Record<string, BriefExample> = {
+// Opens the Google Doc directly; falls back to the internal PDF-style page.
+export const briefHref = (slug: string, example: BriefExample) => example.docUrl || `/brief-example/${slug}`;
+
+export const briefExamples:Record<string, BriefExample> = {
   design: {
     kind: "design",
     label: "DESIGN",

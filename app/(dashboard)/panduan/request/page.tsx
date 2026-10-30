@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ImageIcon, VideoIcon } from "@/components/Icons";
-import { briefExamples } from "@/lib/briefExamples";
+import { briefExamples, briefHref } from "@/lib/briefExamples";
 
 export default function GuideRequestPage() {
   return (
@@ -29,16 +29,16 @@ export default function GuideRequestPage() {
           <span>2</span>
           <div>
             <strong>Write your brief clearly</strong>
-            <p>Open the example that matches your work. It opens in a new tab as a PDF-style page, so you can read it next to your spreadsheet. You do not need to use the exact same words.</p>
+            <p>Open the example that matches your work. It opens in a new tab as a Google Doc, so you can read it next to your spreadsheet. You do not need to use the exact same words.</p>
             <div className="guide-example-stack">
               {Object.entries(briefExamples).map(([slug, example]) => (
-                <a key={slug} href={`/brief-example/${slug}`} target="_blank" rel="noreferrer" className={`guide-example-link is-${example.kind}`}>
+                <a key={slug} href={briefHref(slug, example)} target="_blank" rel="noreferrer" className={`guide-example-link is-${example.kind}`}>
                   <span className="guide-example-icon">{example.kind === "design" ? <ImageIcon /> : <VideoIcon />}</span>
                   <span className="guide-example-title">
                     <small>{example.label}</small>
                     <strong>{example.title}</strong>
                   </span>
-                  <span className="guide-example-open">Open PDF <span aria-hidden="true">↗</span></span>
+                  <span className="guide-example-open">Open example <span aria-hidden="true">↗</span></span>
                 </a>
               ))}
             </div>
@@ -56,8 +56,7 @@ export default function GuideRequestPage() {
           <span>3</span>
           <div>
             <strong>Message WhatsApp, tag @Timedoor Designer</strong>
-            <p>Send it to your team or branch WA group. Include the spreadsheet link plus the row or point number. Use this format:</p>
-            <blockquote>Hi kak @Timedoor Designer, could you help with [request type] for [team/branch name]? Full details: [link], point/row no. [X]. Needed by: [date]. Thank you!</blockquote>
+            <p>Send it to your team or branch WA group. Include the spreadsheet link plus the row or point number.</p>
             <figure className="guide-figure">
               <Image src="/guide-whatsapp-example.png" alt="Example WhatsApp messages tagging @Timedoor Designer with a spreadsheet link and row number" width={5407} height={1338} sizes="(max-width: 960px) 100vw, 800px" />
               <figcaption>Real example: spreadsheet link, tab or row number, and a clear ask.</figcaption>

@@ -13,7 +13,7 @@ const logo = "/timedoor-logo.png";
 const navItems = [
   { label: "Search", href: "/", icon: "library", tone: "green", admin: false },
   { label: "Design Library", href: "/thumbnail", icon: "grid", tone: "blue", admin: false },
-  { label: "Request Guide", href: "/panduan", icon: "info", tone: "orange", admin: false, sub: true },
+  { label: "Request Guide", href: "/panduan", icon: "info", tone: "orange", admin: false },
   { label: "Manage Library", href: "/library", icon: "library", tone: "green", admin: true },
   { label: "Upload", href: "/tambah", icon: "upload", tone: "blue", admin: true },
 ];
@@ -44,7 +44,7 @@ export function Sidebar({ open = false, onClose }: Props) {
         <nav className="sidebar-nav">
           {navItems.filter((item) => isAdmin || !item.admin).map((item) => {
             const active = item.href === "/" ? pathname === "/" : item.href === "/library" ? pathname === "/library" || pathname.startsWith("/edit/") : item.href === "/tambah" ? pathname.startsWith("/tambah") || pathname.startsWith("/impor") : pathname.startsWith(item.href);
-            return <Link key={item.href} href={item.href} className={`nav-item ${item.sub ? "nav-item-sub" : ""} ${active ? "active" : ""}`} onClick={onClose}><span className={`nav-icon nav-icon-${item.tone}`} aria-hidden="true">{icons[item.icon as keyof typeof icons]}</span>{item.label}</Link>;
+            return <Link key={item.href} href={item.href} className={`nav-item ${active ? "active" : ""}`} onClick={onClose}><span className={`nav-icon nav-icon-${item.tone}`} aria-hidden="true">{icons[item.icon as keyof typeof icons]}</span>{item.label}</Link>;
           })}
         </nav>
         <div className="sidebar-bottom">

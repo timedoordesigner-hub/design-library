@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const roles = [
   ["01", "Requester", ["Writes the request in the team spreadsheet with complete, accurate details."], "guide-role-requester"],
-  ["02", "Design team", ["Admin manages: reviews the scope, priority, and readiness before it enters the queue.", "Design team executes: creates the asset, asks questions when needed, and updates the status."], "guide-role-admin"],
+  ["02", "Design team", ["Reviews the request, creates the asset, asks questions when needed, and updates the status."], "guide-role-admin"],
 ] as const;
 
 const faqs = [

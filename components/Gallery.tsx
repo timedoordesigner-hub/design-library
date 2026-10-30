@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { deriveOptions, type Design } from "@/lib/designs";
 import { apply, correction, parseQuery, toParams, type Query } from "@/lib/query";
@@ -33,8 +34,16 @@ export function Gallery() {
 
   return (
     <main className="content-inner pb-16 pt-7">
-      <h2 className="text-xl font-semibold tracking-[-0.02em]">All designs</h2>
-      <p className="mt-1 text-[13px] text-muted">Hover over a thumbnail to see its title, keywords, and Figma link.</p>
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div>
+          <h2 className="text-xl font-semibold tracking-[-0.02em]">All designs</h2>
+          <p className="mt-1 text-[13px] text-muted">Hover over a thumbnail to see its title, keywords, and Figma link.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-[13px] text-muted">Can&apos;t find the design you need? Send a request to the design team.</p>
+          <Link href="/panduan" className="primary-button">Open Request Guide <span aria-hidden="true">→</span></Link>
+        </div>
+      </div>
 
       <div className="gallery-sticky">
         <label className="gallery-search" htmlFor="gallery-search">

@@ -95,12 +95,6 @@
   text-decoration: none;
 }
 
-.nav-item-sub {
-  margin-left: 18px;
-  border-left: 1px solid var(--line-strong);
-  border-radius: 0 4px 4px 0;
-}
-
 .nav-item:hover {
   background: #f7f8fb;
   color: var(--ink);

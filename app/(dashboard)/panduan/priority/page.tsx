@@ -15,7 +15,6 @@ export default function GuidePriorityPage() {
       </section>
 
       <section className="guide-scope-panel">
-        <p className="eyebrow">SCOPE CHECK</p>
         <h3>What can we help with?</h3>
         <p className="guide-scope-lead">You can send a request when it needs design work and you already have the main details ready: the purpose, content, references, and deadline.</p>
         <div className="guide-scope-list">
