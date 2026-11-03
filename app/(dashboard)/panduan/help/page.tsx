@@ -14,7 +14,7 @@ const faqs = [
 const guideLinks = [
   ["Search the library", "Your asset may already exist. Check before you request.", "/", "Search designs", false],
   ["Priority & scope", "See your queue time and what the design team handles.", "/panduan/priority", "View priority", false],
-  ["Submit & track", "Spreadsheet, WhatsApp message, and Notion tracking in one page.", "/panduan/request", "See how", false],
+  ["How to submit","Spreadsheet, WhatsApp message, and Notion tracking in one page.", "/panduan/request", "See how", false],
 ] as const;
 
 export default function GuideHelpPage() {

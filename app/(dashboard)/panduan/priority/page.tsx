@@ -68,7 +68,7 @@ export default function GuidePriorityPage() {
       <div className="guide-cta">
         <strong>Ready to write your request?</strong>
         <p>Next up: see where to log it and what to send on WhatsApp.</p>
-        <Link href="/panduan/request" className="primary-button">Submit &amp; track <span aria-hidden="true">→</span></Link>
+        <Link href="/panduan/request" className="primary-button">How to submit <span aria-hidden="true">→</span></Link>
       </div>
     </>
   );

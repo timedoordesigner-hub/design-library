@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  ["/panduan", "1", "Overview"],
+  ["/panduan", "1", "How it works"],
   ["/panduan/priority", "2", "Priority & scope"],
-  ["/panduan/request", "3", "Submit & track"],
+  ["/panduan/request", "3", "How to submit"],
   ["/panduan/help", "4", "FAQ & help"],
 ];
 

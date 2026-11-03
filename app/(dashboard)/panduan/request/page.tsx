@@ -6,7 +6,7 @@ export default function GuideRequestPage() {
   return (
     <>
       <section className="guide-intro">
-        <p className="eyebrow">SUBMIT &amp; TRACK</p>
+        <p className="eyebrow">HOW TO SUBMIT</p>
         <h2>Write it, send it, track it.</h2>
         <p>Log your brief in your team spreadsheet, send one WhatsApp message, and follow the result in Notion. The design team will confirm the request and share the task link.</p>
       </section>
