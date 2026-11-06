@@ -34,6 +34,14 @@ yarn-error.log*
 .env*
 !.env.local.example
 
+# Google service-account credentials
+/designlibrary-513901-fe1ebcd61cf2.json
+
+# local exports / logs / worktrees
+/design-library-export*.json
+/dev.log
+/.claude/worktrees/
+
 # vercel
 .vercel
 

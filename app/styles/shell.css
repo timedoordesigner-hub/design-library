@@ -130,6 +130,11 @@
   color: var(--warning);
 }
 
+.nav-icon-purple {
+  background: #f0ebfd;
+  color: #6941c6;
+}
+
 .nav-item.active .nav-icon-green {
   background: var(--primary);
   color: #fff;
@@ -143,6 +148,11 @@
 .nav-item.active:has(.nav-icon-blue) {
   background: var(--info-soft);
   color: var(--info-dark);
+}
+
+.nav-item.active .nav-icon-purple {
+  background: #6941c6;
+  color: #fff;
 }
 
 /* ── Chip kategori ── */

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "./AuthProvider";
-import { ExternalIcon, GridIcon, InfoIcon, LibraryIcon, LoginIcon, UploadIcon } from "./Icons";
+import { ExternalIcon, GridIcon, InfoIcon, LibraryIcon, LoginIcon, UploadIcon, VideoIcon } from "./Icons";
 
 const logo = "/timedoor-logo.png";
 
@@ -13,11 +13,12 @@ const logo = "/timedoor-logo.png";
 const navItems = [
   { label: "Search", href: "/", icon: "library", tone: "green", admin: false },
   { label: "Design Library", href: "/thumbnail", icon: "grid", tone: "blue", admin: false },
+  { label: "Video Ads", href: "/ads", icon: "video", tone: "purple", admin: false },
   { label: "Request Guide", href: "/panduan", icon: "info", tone: "orange", admin: false },
   { label: "Manage Library", href: "/library", icon: "library", tone: "green", admin: true },
   { label: "Upload", href: "/tambah", icon: "upload", tone: "blue", admin: true },
 ];
-const icons = { info: <InfoIcon />, library: <LibraryIcon />, grid: <GridIcon />, upload: <UploadIcon /> };
+const icons = { info: <InfoIcon />, library: <LibraryIcon />, grid: <GridIcon />, video: <VideoIcon />, upload: <UploadIcon /> };
 
 type Props = { open?: boolean; onClose?: () => void };
 
