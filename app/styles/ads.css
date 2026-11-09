@@ -36,7 +36,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
 }
 
@@ -86,6 +85,7 @@
   gap: 8px;
   flex: 1 1 220px;
   max-width: 320px;
+  margin-left: auto;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: var(--surface);
@@ -102,27 +102,22 @@
   outline: none;
 }
 
-.ads-branches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.ads-branches button {
+.ads-branch-select {
+  min-width: 190px;
+  max-width: 260px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: var(--surface);
-  padding: 5px 12px;
-  color: var(--muted);
-  font-size: 12px;
-  cursor: pointer;
+  padding: 8px 34px 8px 14px;
+  color: var(--ink);
+  font-size: 13px;
+  outline: none;
 }
 
-.ads-branches button.active {
+.ads-branch-select:focus-visible,
+.ads-search:focus-within {
   border-color: var(--primary);
-  background: var(--primary-soft);
-  color: var(--primary-dark);
+  box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
 .ads-count {
@@ -167,7 +162,9 @@
   background: rgb(0 0 0 / 0%);
   color: #fff;
   opacity: 0;
-  transition: background 0.15s, opacity 0.15s;
+  transition:
+    background 0.15s,
+    opacity 0.15s;
 }
 
 .ads-card:hover .ads-play {

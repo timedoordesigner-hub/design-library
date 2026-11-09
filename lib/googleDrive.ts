@@ -101,6 +101,10 @@ function branchRoot(name: string) {
   return /\b(branch|overseas)\s+ads?\b/i.test(name);
 }
 
+function isFootageFolder(name: string) {
+  return /footage/i.test(name);
+}
+
 async function loadVideos(token: string) {
   if (!ROOT_ID) throw new Error("Google Drive is not configured. Add GOOGLE_DRIVE_ADS_FOLDER_ID.");
   const videos: AdVideo[] = [];
@@ -112,7 +116,7 @@ async function loadVideos(token: string) {
     const children = await listChildren(token, current.id);
     for (const file of children) {
       if (file.mimeType === "application/vnd.google-apps.folder") {
-        queue.push({ id: file.id, path: [...current.path, file.name] });
+        if (!isFootageFolder(file.name)) queue.push({ id: file.id, path: [...current.path, file.name] });
         continue;
       }
       if (!file.mimeType.startsWith("video/")) continue;

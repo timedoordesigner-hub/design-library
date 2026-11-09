@@ -185,6 +185,22 @@
     flex: none;
   }
 
+  .ads-toolbar {
+    align-items: stretch;
+  }
+
+  .ads-tabs,
+  .ads-branch-select,
+  .ads-search {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .ads-branch-select {
+    min-width: 0;
+  }
+
   .search-home {
     width: min(100% - 32px, 760px);
   }
