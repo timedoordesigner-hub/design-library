@@ -12,6 +12,7 @@ const formatDuration = (seconds: number) =>
     : "";
 
 const VISIBLE_BRANCHES = 8;
+const PAGE_SIZE = 24;
 
 const branchLabel = (name: string) => name.replace(/^\d+[\s._-]*/, "");
 
@@ -21,6 +22,7 @@ export default function AdsGallery({ videos }: Props) {
   const [area, setArea] = useState<AdVideo["area"]>("local");
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
   const [activeVideo, setActiveVideo] = useState<AdVideo>();
+  const [page, setPage] = useState(1);
   const branchVideos = useMemo(
     () =>
       videos.filter(
@@ -58,10 +60,13 @@ export default function AdsGallery({ videos }: Props) {
       );
     });
   }, [area, query, selectedBranches, tab, videos]);
+  const pagedVideos = visible.slice(0, page * PAGE_SIZE);
+  const hasMore = pagedVideos.length < visible.length;
 
   const chooseArea = (value: AdVideo["area"]) => {
     setArea(value);
     setSelectedBranches([]);
+    setPage(1);
   };
 
   const toggleBranch = (value: string) => {
@@ -86,6 +91,7 @@ export default function AdsGallery({ videos }: Props) {
               onClick={() => {
                 setTab(value);
                 setSelectedBranches([]);
+                setPage(1);
               }}
             >
               {value === "general" ? "General" : "Branch"}
@@ -101,7 +107,10 @@ export default function AdsGallery({ videos }: Props) {
             <input
               type="search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setPage(1);
+              }}
               placeholder="Search videos…"
             />
           </label>
@@ -172,7 +181,7 @@ export default function AdsGallery({ videos }: Props) {
         <div className="ads-results">
           {visible.length ? (
             <div className="ads-grid">
-              {visible.map((video) => (
+              {pagedVideos.map((video) => (
                 <button
                   key={video.id}
                   type="button"
@@ -206,6 +215,15 @@ export default function AdsGallery({ videos }: Props) {
               <strong>No videos found.</strong>
               <p>Try another search or location.</p>
             </div>
+          )}
+          {hasMore && (
+            <button
+              type="button"
+              className="ads-load-more"
+              onClick={() => setPage((current) => current + 1)}
+            >
+              Muat lebih banyak
+            </button>
           )}
         </div>
       </div>
