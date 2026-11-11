@@ -190,14 +190,33 @@
   }
 
   .ads-tabs,
-  .ads-branch-select,
-  .ads-search {
+  .ads-search-wrap {
     width: 100%;
     max-width: none;
     margin-left: 0;
   }
 
-  .ads-branch-select {
+  .ads-layout {
+    display: block;
+  }
+
+  .ads-filters {
+    width: auto;
+    margin-bottom: 16px;
+  }
+
+  .ads-modal {
+    flex-direction: column;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+  }
+
+  .ads-modal-video {
+    flex: none;
+  }
+
+  .ads-modal-copy {
+    flex: none;
     min-width: 0;
   }
 
