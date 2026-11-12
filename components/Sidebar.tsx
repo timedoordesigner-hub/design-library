@@ -16,6 +16,7 @@ const navItems = [
   { label: "Video Ads", href: "/ads", icon: "video", tone: "purple", admin: false },
   { label: "Request Guide", href: "/panduan", icon: "info", tone: "orange", admin: false },
   { label: "Manage Library", href: "/library", icon: "library", tone: "green", admin: true },
+  { label: "Manage Ads", href: "/manage-ads", icon: "video", tone: "purple", admin: true },
   { label: "Upload", href: "/tambah", icon: "upload", tone: "blue", admin: true },
 ];
 const icons = { info: <InfoIcon />, library: <LibraryIcon />, grid: <GridIcon />, video: <VideoIcon />, upload: <UploadIcon /> };

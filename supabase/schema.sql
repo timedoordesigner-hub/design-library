@@ -55,6 +55,25 @@ drop policy if exists "designs_admin_delete" on public.designs;
 create policy "designs_admin_delete" on public.designs
   for delete to authenticated using (public.is_admin());
 
+-- Pengaturan tampilan video; file asli tetap di Google Drive.
+create table if not exists public.ads_video_settings (
+  video_id text primary key,
+  title text check (title is null or length(title) <= 300),
+  description text check (description is null or length(description) <= 2000),
+  hidden boolean not null default false
+);
+alter table public.ads_video_settings enable row level security;
+grant select on public.ads_video_settings to anon, authenticated;
+grant insert, update, delete on public.ads_video_settings to authenticated;
+drop policy if exists "ads_settings_read" on public.ads_video_settings;
+create policy "ads_settings_read" on public.ads_video_settings for select to anon, authenticated using (true);
+drop policy if exists "ads_settings_admin_insert" on public.ads_video_settings;
+create policy "ads_settings_admin_insert" on public.ads_video_settings for insert to authenticated with check (public.is_admin());
+drop policy if exists "ads_settings_admin_update" on public.ads_video_settings;
+create policy "ads_settings_admin_update" on public.ads_video_settings for update to authenticated using (public.is_admin()) with check (public.is_admin());
+drop policy if exists "ads_settings_admin_delete" on public.ads_video_settings;
+create policy "ads_settings_admin_delete" on public.ads_video_settings for delete to authenticated using (public.is_admin());
+
 -- Storage: bucket publik untuk gambar preview (baca publik, tulis admin).
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('design-previews', 'design-previews', true, 5242880, array['image/png', 'image/jpeg', 'image/webp'])

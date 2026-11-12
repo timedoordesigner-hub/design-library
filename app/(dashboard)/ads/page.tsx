@@ -51,7 +51,7 @@ export default function AdsPage() {
           </p>
         </div>
       </header>
-      <Suspense fallback={<div className="ads-loading">Loading videos…</div>}>
+      <Suspense fallback={<div className="ads-skeleton" role="status" aria-label="Memuat video"><span className="ads-skeleton-label">Memuat video…</span><div className="ads-grid">{Array.from({ length: 8 }, (_, index) => <div key={index} className="ads-skeleton-card" />)}</div></div>}>
         <AdsContent />
       </Suspense>
     </main>

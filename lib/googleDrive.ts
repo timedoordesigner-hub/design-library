@@ -26,6 +26,7 @@ type DriveListResponse = { files?: DriveFile[]; nextPageToken?: string };
 type FolderTask = {
   id: string;
   path: string[];
+  description?: string;
   files?: DriveFile[];
   index?: number;
 };
@@ -35,6 +36,7 @@ export type AdVideo = {
   id: string;
   name: string;
   folder: string;
+  group: string;
   branch: string;
   area: "local" | "overseas";
   category: "general" | "branch";
@@ -168,19 +170,24 @@ function branchRoot(name: string) {
   return /\b(branch|overseas)\s+ads?\b/i.test(name);
 }
 
+const ARCHIVE_NAME = /(?:^|[^a-z])archi(?:v|ev)(?:e|ed)?(?=$|[^a-z])/i;
+
+const CTA_NAME = /(?:^|[^a-z])cta(?=$|[^a-z])/i;
+
 function isExcludedFolder(name: string) {
-  return /footage|voice\s*over/i.test(name);
+  return /footage|voice\s*over|learning\s*tools/i.test(name) || CTA_NAME.test(name) || ARCHIVE_NAME.test(name) || /^achieve$/i.test(name.trim());
 }
 
 const EXCLUDED_PREFIX = /^(img|pisa|tka|footage|vo|showing)(?![a-z])/i;
 const KEEP_PREFIX = /^ads(?![a-z])/i;
 
 function isExcludedVideo(name: string) {
+  if (ARCHIVE_NAME.test(name) || CTA_NAME.test(name)) return true;
   if (KEEP_PREFIX.test(name)) return false;
   return EXCLUDED_PREFIX.test(name);
 }
 
-function videoFromFile(file: DriveFile, path: string[]) {
+function videoFromFile(file: DriveFile, path: string[], inherited = "") {
   const root = path.findIndex(branchRoot);
   const isBranch = root >= 0;
   const branch = isBranch ? (path[root + 1] ?? path[root]) : "";
@@ -189,6 +196,8 @@ function videoFromFile(file: DriveFile, path: string[]) {
     id: file.id,
     name: file.name,
     folder: path.at(-1) ?? "General",
+    // Folder tingkat atas (kategori iklan); subfolder versi/result tidak ikut.
+    group: (isBranch ? path[root + 2] : path[0]) ?? "",
     branch,
     area,
     category: isBranch ? "branch" : "general",
@@ -196,7 +205,8 @@ function videoFromFile(file: DriveFile, path: string[]) {
     thumbnail:
       file.thumbnailLink ??
       `https://drive.google.com/thumbnail?id=${file.id}&sz=w1000`,
-    description: file.description ?? "",
+    // Video's own description wins; else nearest folder description.
+    description: file.description?.trim() || inherited,
     duration: duration(file.videoMediaMetadata?.durationMillis),
     width: file.videoMediaMetadata?.width,
     height: file.videoMediaMetadata?.height,
@@ -229,13 +239,16 @@ async function loadVideos(token: string) {
             queue.push({
               id: file.id,
               path: [...current.path, file.name],
+              description: file.description?.trim() || current.description,
             });
           }
           continue;
         }
         if (!file.mimeType.startsWith("video/") || isExcludedVideo(file.name))
           continue;
-        videos.push(videoFromFile(file, current.path));
+        // Success Story: hanya subfolder RESULT yang tampil, bukan video mentah di folder utamanya.
+        if (/success\s*story/i.test(current.path.at(-1) ?? "")) continue;
+        videos.push(videoFromFile(file, current.path, current.description));
         processed += 1;
         if (processed >= 10_000) break;
       }
