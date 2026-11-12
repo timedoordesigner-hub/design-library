@@ -12,11 +12,11 @@ async function ManageAdsContent() {
   try {
     videos = await getAdVideos();
   } catch {
-    return <div className="ads-error" role="alert">Video tidak dapat dimuat dari Google Drive.</div>;
+    return <div className="ads-error" role="alert">Videos could not be loaded from Google Drive.</div>;
   }
   return <AdsGallery videos={videos} manage />;
 }
 
 export default function ManageAdsPage() {
-  return <AdminOnly><main className="content-inner ads-page"><header className="ads-header"><h2>Manage Ads</h2><p>Edit atau sembunyikan video tanpa mengubah file Google Drive.</p></header><Suspense fallback={<div className="ads-loading">Memuat video…</div>}><ManageAdsContent /></Suspense></main></AdminOnly>;
+  return <AdminOnly><main className="content-inner ads-page"><header className="ads-header"><h2>Manage Ads</h2><p>Edit or hide videos without changing files in Google Drive.</p></header><Suspense fallback={<div className="ads-loading">Loading videos…</div>}><ManageAdsContent /></Suspense></main></AdminOnly>;
 }

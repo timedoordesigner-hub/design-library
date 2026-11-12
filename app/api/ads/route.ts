@@ -7,7 +7,7 @@ export async function GET() {
     const message =
       error instanceof Error
         ? error.message
-        : "Google Drive tidak bisa diakses.";
+        : "Google Drive could not be reached.";
     return Response.json({ message }, { status: 500 });
   }
 }

@@ -14,6 +14,7 @@ type DriveFile = {
   webViewLink?: string;
   thumbnailLink?: string;
   description?: string;
+  createdTime?: string;
   videoMediaMetadata?: {
     durationMillis?: string;
     width?: number;
@@ -43,6 +44,7 @@ export type AdVideo = {
   url: string;
   thumbnail: string;
   description: string;
+  createdTime: string;
   duration: number;
   width?: number;
   height?: number;
@@ -138,7 +140,7 @@ async function listChildren(token: string, parent: string) {
     const params = new URLSearchParams({
       q: `'${parent}' in parents and trashed = false`,
       fields:
-        "nextPageToken,files(id,name,mimeType,webViewLink,thumbnailLink,description,videoMediaMetadata)",
+        "nextPageToken,files(id,name,mimeType,webViewLink,thumbnailLink,description,createdTime,videoMediaMetadata)",
       pageSize: "1000",
       orderBy: "name_natural",
       supportsAllDrives: "true",
@@ -207,6 +209,7 @@ function videoFromFile(file: DriveFile, path: string[], inherited = "") {
       `https://drive.google.com/thumbnail?id=${file.id}&sz=w1000`,
     // Video's own description wins; else nearest folder description.
     description: file.description?.trim() || inherited,
+    createdTime: file.createdTime ?? "",
     duration: duration(file.videoMediaMetadata?.durationMillis),
     width: file.videoMediaMetadata?.width,
     height: file.videoMediaMetadata?.height,

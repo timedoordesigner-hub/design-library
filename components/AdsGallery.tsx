@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "./AuthProvider";
 import type { AdVideo } from "@/lib/googleDrive";
-import { EyeIcon, EyeOffIcon, PencilIcon, SearchIcon, VideoIcon } from "./Icons";
+import { EyeIcon, EyeOffIcon, InfoIcon, PencilIcon, SearchIcon, VideoIcon } from "./Icons";
 
 type Props = { videos: AdVideo[]; manage?: boolean };
 type VideoSetting = { video_id: string; title: string | null; description: string | null; hidden: boolean };
@@ -13,6 +13,26 @@ const formatDuration = (seconds: number) =>
   seconds
     ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`
     : "";
+
+// Videos uploaded within this many days count as "New" in Manage Ads.
+const NEW_DAYS = 7;
+const RECENT_LIMIT = 8;
+
+const uploadAge = (iso: string, now: number) => {
+  const minutes = Math.max(0, Math.floor((now - Date.parse(iso)) / 60_000));
+  if (minutes < 60) return "just now";
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return days < 30 ? `${days}d ago` : new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+};
+
+const InfoTip = ({ label, children, right = false }: { label: string; children: string; right?: boolean }) => (
+  <span className={`info-tip${right ? " info-tip-right" : ""}`} tabIndex={0} role="button" aria-label={label}>
+    <InfoIcon />
+    <span className="info-tip-popup" role="tooltip">{children}</span>
+  </span>
+);
 
 const VISIBLE_BRANCHES = 8;
 const PAGE_SIZE = 24;
@@ -29,14 +49,15 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
   const [settingsError, setSettingsError] = useState("");
   const [editing, setEditing] = useState<AdVideo>();
   const [saving, setSaving] = useState(false);
+  const [now] = useState(() => Date.now());
   useEffect(() => {
     let active = true;
     Promise.resolve().then(() => supabase().from("ads_video_settings").select("video_id,title,description,hidden")).then(({ data, error }) => {
       if (!active) return;
-      if (error) setSettingsError("Pengaturan video belum tersedia. Hubungi admin.");
+      if (error) setSettingsError("Video settings are unavailable. Contact an admin.");
       else setSettings(data as VideoSetting[]);
     }).catch(() => {
-      if (active) setSettingsError("Pengaturan video belum tersedia. Hubungi admin.");
+      if (active) setSettingsError("Video settings are unavailable. Contact an admin.");
     });
     return () => { active = false; };
   }, []);
@@ -135,47 +156,63 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
       setSettings((current) => [...(current ?? []).filter((item) => item.video_id !== setting.video_id), setting]);
       setEditing(undefined);
     } catch {
-      setSettingsError("Gagal menyimpan. Pastikan akun admin dan tabel pengaturan tersedia.");
+      setSettingsError("Could not save. Make sure you are an admin and the settings table exists.");
     } finally {
       setSaving(false);
     }
   };
 
   if (settingsError && !settings) return <div className="ads-error" role="alert">{settingsError}</div>;
-  if (!settings) return <div className="ads-loading" role="status">Memuat pengaturan video…</div>;
+  if (!settings) return <div className="ads-loading" role="status">Loading video settings…</div>;
 
-  if (manage && !isAdmin) return <div className="ads-error">Halaman ini hanya untuk admin.</div>;
+  if (manage && !isAdmin) return <div className="ads-error">This page is for admins only.</div>;
 
   const manageNeedle = query.trim().toLowerCase();
   const manageList = videos.filter((video) => `${video.name} ${video.folder} ${video.branch} ${video.displayTitle ?? ""}`.toLowerCase().includes(manageNeedle));
 
+  const isNew = (video: AdVideo) => Boolean(video.createdTime) && now - Date.parse(video.createdTime) < NEW_DAYS * 86_400_000;
+  const placeOf = (video: AdVideo) => video.category === "branch" ? `${branchLabel(video.branch)} › ${branchLabel(video.folder)}` : branchLabel(video.folder);
+  const recent = manage
+    ? videos.filter((video) => video.createdTime).sort((a, b) => Date.parse(b.createdTime) - Date.parse(a.createdTime)).slice(0, RECENT_LIMIT)
+    : [];
+
   if (manage) return (
     <section className="ads-browser" aria-label="Manage Ads">
-      <label className="ads-search"><SearchIcon /><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari video…" aria-label="Cari video" /></label>
-      <dl className="ads-admin-stats" aria-label="Jumlah video">
-        <div><dt>{manageNeedle ? "Hasil" : "Total"}</dt><dd>{manageList.length}{manageNeedle && <small> / {videos.length}</small>}</dd></div>
-        <div><dt>Tampil</dt><dd>{manageList.filter((video) => !video.hidden).length}</dd></div>
-        <div><dt>Tersembunyi</dt><dd>{manageList.filter((video) => video.hidden).length}</dd></div>
-        <div><dt>Diedit</dt><dd>{manageList.filter((video) => video.edited).length}</dd></div>
-      </dl>
+      <label className="ads-search"><SearchIcon /><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search videos…" aria-label="Search videos" /></label>
+      <section className="stat-row ads-admin-stats" aria-label="Video counts">
+        <div className="stat-card stat-green"><span className="eyebrow">{manageNeedle ? "Results" : "Total videos"}</span><strong>{manageList.length}{manageNeedle && <small> / {videos.length}</small>}</strong><span className="stat-caption">videos in Drive sync</span></div>
+        <div className="stat-card stat-blue"><span className="eyebrow">Visible <InfoTip label="What is Visible?">Videos shown to everyone on the Video Ads page.</InfoTip></span><strong>{manageList.filter((video) => !video.hidden).length}</strong><span className="stat-caption">available on the website</span></div>
+        <div className="stat-card stat-orange"><span className="eyebrow">Hidden <InfoTip label="What is Hidden?">Hidden videos are removed from the website only. The Drive file is untouched.</InfoTip></span><strong>{manageList.filter((video) => video.hidden).length}</strong><span className="stat-caption">Drive files kept intact</span></div>
+        <div className="stat-card stat-blue"><span className="eyebrow">Edited <InfoTip label="What is Edited?">Videos with a custom title or description that replaces the Drive one.</InfoTip></span><strong>{manageList.filter((video) => video.edited).length}</strong><span className="stat-caption">custom title or description</span></div>
+      </section>
+      {recent.length > 0 && <div className="ads-recent">
+        <h3>Recent uploads <InfoTip label="About recent uploads">{`Newest videos synced from Google Drive. Marked "New" for ${NEW_DAYS} days after upload. Age is based on the Drive upload date.`}</InfoTip></h3>
+        <ul>
+          {recent.map((video) => <li key={video.id}>
+            <span className="ads-recent-copy"><strong>{videoTitle(video)}</strong><small>{placeOf(video)}</small></span>
+            {isNew(video) && <em className="ads-new-badge">New</em>}
+            <time dateTime={video.createdTime} title={new Date(video.createdTime).toLocaleString("en-GB")}>{uploadAge(video.createdTime, now)}</time>
+          </li>)}
+        </ul>
+      </div>}
       {settingsError && <p className="ads-error" role="alert">{settingsError}</p>}
       <div className="ads-admin-table-wrap">
-        <p className="ads-admin-note">Kelola video yang sesuai pencarian. Sembunyikan tidak menghapus file Drive.</p>
-        <div className="data-table ads-admin-table" role="table" aria-label="Daftar video ads">
+        <p className="ads-admin-note">Manage the videos matching your search. Hiding a video does not delete the Drive file.</p>
+        <div className="data-table ads-admin-table" role="table" aria-label="Video ads list">
           <div className="table-head" role="row">
             <span role="columnheader">Video</span>
-            <span role="columnheader">Lokasi</span>
+            <span role="columnheader">Location</span>
             <span role="columnheader">Status</span>
-            <span role="columnheader">Aksi</span>
+            <span role="columnheader">Actions</span>
           </div>
           {manageList.map((video) => <div className={`table-row ads-admin-table-row${video.edited ? " is-edited" : ""}`} role="row" key={video.id}>
-            <span className="ads-admin-video" role="cell"><strong>{videoTitle(video)}</strong><small>{video.edited && <em className="ads-admin-edited" title="Judul/deskripsi sudah diedit"><PencilIcon /> Diedit</em>}{branchLabel(video.folder)}</small></span>
+            <span className="ads-admin-video" role="cell"><strong>{videoTitle(video)}</strong><small>{isNew(video) && <em className="ads-new-badge">New</em>}{video.edited && <em className="ads-admin-edited" title="Title/description edited"><PencilIcon /> Edited</em>}{branchLabel(video.folder)}</small></span>
             <span className="table-cell-muted" role="cell">{video.category === "branch" ? branchLabel(video.branch) : "General"}</span>
-            <span role="cell"><span className={`ads-admin-status ${video.hidden ? "is-hidden" : "is-visible"}`}>{video.hidden ? "Tersembunyi" : "Tampil"}</span></span>
+            <span role="cell"><span className={`ads-admin-status ${video.hidden ? "is-hidden" : "is-visible"}`}>{video.hidden ? "Hidden" : "Visible"}</span></span>
             <span className="ads-admin-actions" role="cell">
-              <button type="button" className="control-button ads-icon-button" title="Edit" aria-label="Edit" onClick={() => setEditing(video)}><PencilIcon /></button>
-              <button type="button" className="control-button ads-icon-button" title={video.hidden ? "Tampilkan" : "Sembunyikan"} aria-label={video.hidden ? "Tampilkan" : "Sembunyikan"} disabled={saving} onClick={() => {
-                if (!video.hidden && !window.confirm("Sembunyikan video ini dari website? File Drive tetap ada.")) return;
+              <button type="button" className="icon-button icon-edit" title="Edit" aria-label="Edit" onClick={() => setEditing(video)}><PencilIcon /></button>
+              <button type="button" className={`icon-button ${video.hidden ? "icon-show" : "icon-delete"}`} title={video.hidden ? "Show" : "Hide"} aria-label={video.hidden ? "Show" : "Hide"} disabled={saving} onClick={() => {
+                if (!video.hidden && !window.confirm("Hide this video from the website? The Drive file stays untouched.")) return;
                 void saveSetting({ video_id: video.id, title: video.displayTitle ?? null, description: settings.find((item) => item.video_id === video.id)?.description ?? null, hidden: !video.hidden });
               }}>{video.hidden ? <EyeIcon /> : <EyeOffIcon />}</button>
             </span>
@@ -188,11 +225,11 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
         void saveSetting({ video_id: editing.id, title: String(form.get("title") || "").trim() || null, description: String(form.get("description") || "").trim() || null, hidden: settings.find((item) => item.video_id === editing.id)?.hidden ?? false });
       }}>
         <strong>Edit: {editing.name}</strong>
-        <label>Judul <input name="title" maxLength={300} defaultValue={settings.find((item) => item.video_id === editing.id)?.title ?? ""} placeholder={fileLabel(editing.name)} /></label>
-        <label>Deskripsi <textarea name="description" maxLength={2000} defaultValue={settings.find((item) => item.video_id === editing.id)?.description ?? ""} placeholder="Gunakan deskripsi Drive" /></label>
+        <label>Title <input name="title" maxLength={300} defaultValue={settings.find((item) => item.video_id === editing.id)?.title ?? ""} placeholder={fileLabel(editing.name)} /></label>
+        <label>Description <textarea name="description" maxLength={2000} defaultValue={settings.find((item) => item.video_id === editing.id)?.description ?? ""} placeholder="Use the Drive description" /></label>
         <div className="ads-admin-form-actions">
-          <button type="button" className="control-button" onClick={() => setEditing(undefined)}>Batal</button>
-          <button type="submit" className="primary-button" disabled={saving}>Simpan</button>
+          <button type="button" className="control-button" onClick={() => setEditing(undefined)}>Cancel</button>
+          <button type="submit" className="primary-button" disabled={saving}>Save</button>
         </div>
       </form></div>}
     </section>
@@ -255,7 +292,7 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
                 </button>
               )}
             </div>
-            {shownFolders.map(([label, count]) => (
+            {shownFolders.map(([label]) => (
               <label key={label} className="ads-filter-option">
                 <input
                   type="checkbox"
@@ -271,7 +308,7 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
                 className="ads-filter-more"
                 onClick={() => setShowAllFolders((current) => !current)}
               >
-                {showAllFolders ? "Lebih sedikit" : "Lainnya"}
+                {showAllFolders ? "Show less" : "Show more"}
               </button>
             )}
           </aside>
@@ -299,7 +336,7 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
             </label>
             <div className="ads-filter-divider" />
             <div className="ads-filter-heading">
-              <p className="ads-filter-title">Lokasi</p>
+              <p className="ads-filter-title">Location</p>
               {selectedBranches.length > 0 && (
                 <button type="button" onClick={() => { setSelectedBranches([]); setPage(1); }}>
                   Clear
@@ -326,7 +363,7 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
                 className="ads-filter-more"
                 onClick={() => setShowAllBranches((current) => !current)}
               >
-                {showAllBranches ? "Lebih sedikit" : "Lainnya"}
+                {showAllBranches ? "Show less" : "Show more"}
               </button>
             )}
           </aside>
@@ -366,14 +403,14 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
               <p>Try another search or location.</p>
             </div>
           )}
-          {visible.length > PAGE_SIZE && <p className="ads-page-count">{pagedVideos.length} dari {visible.length} video</p>}
+          {visible.length > PAGE_SIZE && <p className="ads-page-count">Showing {pagedVideos.length} of {visible.length} videos</p>}
           {hasMore && (
             <button
               type="button"
               className="ads-load-more"
               onClick={() => setPage((current) => current + 1)}
             >
-              Muat lebih banyak
+              Load more
             </button>
           )}
         </div>
@@ -428,7 +465,7 @@ function VideoViewer({
           <p className="eyebrow">VIDEO DETAILS</p>
           <h2 id="ads-modal-title">{videoTitle(video)}</h2>
           <dl>
-            {video.duration > 0 && <div><dt>Durasi</dt><dd>{formatDuration(video.duration)}</dd></div>}
+            {video.duration > 0 && <div><dt>Duration</dt><dd>{formatDuration(video.duration)}</dd></div>}
             <div>
               <dt>Location</dt>
               <dd>

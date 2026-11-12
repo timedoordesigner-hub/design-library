@@ -100,56 +100,140 @@
   gap: 6px;
 }
 
-.ads-admin-actions .control-button {
-  min-height: 30px;
-  padding: 0 10px;
+.icon-show {
+  border-color: var(--primary-soft);
+  background: var(--primary-soft);
+  color: var(--primary-dark);
 }
 
-.ads-icon-button {
-  display: inline-grid;
-  place-items: center;
-  width: 32px;
-  padding: 0 !important;
+.icon-show:hover {
+  border-color: var(--primary);
 }
 
-.ads-icon-button svg {
-  width: 16px;
-  height: 16px;
+.icon-button svg {
+  width: 15px;
+  height: 15px;
 }
+
+/* Stat cards reuse .stat-card from library.css; 4 columns here. */
 
 .ads-admin-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 12px;
-  margin: 16px 0 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 16px;
 }
 
-.ads-admin-stats div {
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  background: var(--surface);
-  padding: 10px 14px;
+.ads-admin-stats .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.ads-admin-stats dt {
-  color: var(--muted-soft);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.ads-admin-stats dd {
-  margin: 2px 0 0;
-  color: var(--ink);
-  font-size: 20px;
-  font-weight: 650;
-}
-
-.ads-admin-stats dd small {
+.ads-admin-stats strong small {
   color: var(--muted);
   font-size: 12px;
   font-weight: 400;
+}
+
+.ads-admin-stats .info-tip svg {
+  width: 13px;
+  height: 13px;
+}
+
+.ads-admin-stats .info-tip-popup {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+@media (max-width: 760px) {
+  .ads-admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ads-recent {
+  margin-top: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  padding: 12px 14px;
+}
+
+.ads-recent h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.ads-recent .info-tip svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ads-recent .info-tip-popup {
+  width: 220px;
+}
+
+.ads-recent ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ads-recent li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding: 7px 0;
+}
+
+.ads-recent li:first-child {
+  border-top: 0;
+}
+
+.ads-recent-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+}
+
+.ads-recent-copy strong,
+.ads-recent-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ads-recent-copy strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ads-recent-copy small,
+.ads-recent time {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.ads-recent time {
+  flex: none;
+}
+
+.ads-new-badge {
+  flex: none;
+  margin-right: 6px;
+  border-radius: 999px;
+  background: var(--primary);
+  padding: 1px 8px;
+  color: #fff;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
 }
 
 .ads-admin-modal {

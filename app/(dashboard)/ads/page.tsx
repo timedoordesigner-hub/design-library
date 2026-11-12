@@ -22,14 +22,14 @@ async function AdsContent() {
       message.includes("Google Drive API has not been used");
     return (
       <div className="ads-error">
-        <strong>Video Ads belum tersedia.</strong>
+        <strong>Video Ads is unavailable.</strong>
         {apiDisabled ? (
           <p>
-            Aktifkan Google Drive API di Google Cloud Console, tunggu beberapa
-            menit, lalu refresh halaman.
+            Enable the Google Drive API in Google Cloud Console, wait a few
+            minutes, then refresh the page.
           </p>
         ) : (
-          <p>{message || "Google Drive tidak bisa diakses."}</p>
+          <p>{message || "Google Drive could not be reached."}</p>
         )}
       </div>
     );
@@ -51,7 +51,7 @@ export default function AdsPage() {
           </p>
         </div>
       </header>
-      <Suspense fallback={<div className="ads-skeleton" role="status" aria-label="Memuat video"><span className="ads-skeleton-label">Memuat video…</span><div className="ads-grid">{Array.from({ length: 8 }, (_, index) => <div key={index} className="ads-skeleton-card" />)}</div></div>}>
+      <Suspense fallback={<div className="ads-skeleton" role="status" aria-label="Loading videos"><span className="ads-skeleton-label">Loading videos…</span><div className="ads-grid">{Array.from({ length: 8 }, (_, index) => <div key={index} className="ads-skeleton-card" />)}</div></div>}>
         <AdsContent />
       </Suspense>
     </main>
