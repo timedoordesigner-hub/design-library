@@ -14,7 +14,7 @@ const formatDuration = (seconds: number) =>
     ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`
     : "";
 
-// Videos uploaded within this many days count as "New" in Manage Ads.
+// Videos uploaded within this many days count as "New" in Manage Video Library.
 const NEW_DAYS = 7;
 const RECENT_LIMIT = 8;
 
@@ -33,6 +33,19 @@ const InfoTip = ({ label, children, right = false }: { label: string; children: 
     <span className="info-tip-popup" role="tooltip">{children}</span>
   </span>
 );
+
+const MANAGE_PAGE_SIZE = 10;
+
+// 1 … 4 5 [6] 7 8 … 20
+const pageNumbers = (current: number, total: number) => {
+  const keep = new Set([1, total, current - 1, current, current + 1]);
+  const list: (number | "gap")[] = [];
+  for (let n = 1; n <= total; n++) {
+    if (!keep.has(n)) { if (list.at(-1) !== "gap") list.push("gap"); continue; }
+    list.push(n);
+  }
+  return list;
+};
 
 const VISIBLE_BRANCHES = 8;
 const PAGE_SIZE = 24;
@@ -169,6 +182,10 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
 
   const manageNeedle = query.trim().toLowerCase();
   const manageList = videos.filter((video) => `${video.name} ${video.folder} ${video.branch} ${video.displayTitle ?? ""}`.toLowerCase().includes(manageNeedle));
+  const totalPages = Math.max(1, Math.ceil(manageList.length / MANAGE_PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * MANAGE_PAGE_SIZE;
+  const manageRows = manageList.slice(pageStart, pageStart + MANAGE_PAGE_SIZE);
 
   const isNew = (video: AdVideo) => Boolean(video.createdTime) && now - Date.parse(video.createdTime) < NEW_DAYS * 86_400_000;
   const placeOf = (video: AdVideo) => video.category === "branch" ? `${branchLabel(video.branch)} › ${branchLabel(video.folder)}` : branchLabel(video.folder);
@@ -177,11 +194,11 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
     : [];
 
   if (manage) return (
-    <section className="ads-browser" aria-label="Manage Ads">
-      <label className="ads-search"><SearchIcon /><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search videos…" aria-label="Search videos" /></label>
+    <section className="ads-browser" aria-label="Manage Video Library">
+      <label className="ads-search"><SearchIcon /><input type="search" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Search videos…" aria-label="Search videos" /></label>
       <section className="stat-row ads-admin-stats" aria-label="Video counts">
         <div className="stat-card stat-green"><span className="eyebrow">{manageNeedle ? "Results" : "Total videos"}</span><strong>{manageList.length}{manageNeedle && <small> / {videos.length}</small>}</strong><span className="stat-caption">videos in Drive sync</span></div>
-        <div className="stat-card stat-blue"><span className="eyebrow">Visible <InfoTip label="What is Visible?">Videos shown to everyone on the Video Ads page.</InfoTip></span><strong>{manageList.filter((video) => !video.hidden).length}</strong><span className="stat-caption">available on the website</span></div>
+        <div className="stat-card stat-blue"><span className="eyebrow">Visible <InfoTip label="What is Visible?">Videos shown to everyone on the Video Library page.</InfoTip></span><strong>{manageList.filter((video) => !video.hidden).length}</strong><span className="stat-caption">available on the website</span></div>
         <div className="stat-card stat-orange"><span className="eyebrow">Hidden <InfoTip label="What is Hidden?">Hidden videos are removed from the website only. The Drive file is untouched.</InfoTip></span><strong>{manageList.filter((video) => video.hidden).length}</strong><span className="stat-caption">Drive files kept intact</span></div>
         <div className="stat-card stat-blue"><span className="eyebrow">Edited <InfoTip label="What is Edited?">Videos with a custom title or description that replaces the Drive one.</InfoTip></span><strong>{manageList.filter((video) => video.edited).length}</strong><span className="stat-caption">custom title or description</span></div>
       </section>
@@ -198,14 +215,14 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
       {settingsError && <p className="ads-error" role="alert">{settingsError}</p>}
       <div className="ads-admin-table-wrap">
         <p className="ads-admin-note">Manage the videos matching your search. Hiding a video does not delete the Drive file.</p>
-        <div className="data-table ads-admin-table" role="table" aria-label="Video ads list">
+        <div className="data-table ads-admin-table" role="table" aria-label="Video library list">
           <div className="table-head" role="row">
             <span role="columnheader">Video</span>
             <span role="columnheader">Location</span>
             <span role="columnheader">Status</span>
             <span role="columnheader">Actions</span>
           </div>
-          {manageList.map((video) => <div className={`table-row ads-admin-table-row${video.edited ? " is-edited" : ""}`} role="row" key={video.id}>
+          {manageRows.map((video) => <div className={`table-row ads-admin-table-row${video.edited ? " is-edited" : ""}`} role="row" key={video.id}>
             <span className="ads-admin-video" role="cell"><strong>{videoTitle(video)}</strong><small>{isNew(video) && <em className="ads-new-badge">New</em>}{video.edited && <em className="ads-admin-edited" title="Title/description edited"><PencilIcon /> Edited</em>}{branchLabel(video.folder)}</small></span>
             <span className="table-cell-muted" role="cell">{video.category === "branch" ? branchLabel(video.branch) : "General"}</span>
             <span role="cell"><span className={`ads-admin-status ${video.hidden ? "is-hidden" : "is-visible"}`}>{video.hidden ? "Hidden" : "Visible"}</span></span>
@@ -217,7 +234,22 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
               }}>{video.hidden ? <EyeIcon /> : <EyeOffIcon />}</button>
             </span>
           </div>)}
+          {manageList.length === 0 && <p className="ads-admin-empty">No videos match your search.</p>}
         </div>
+        {manageList.length > 0 && <nav className="ads-pager" aria-label="Video pages">
+          <p className="ads-pager-info">
+            Showing {pageStart + 1}–{pageStart + manageRows.length} of {manageList.length} videos
+            <span> · {MANAGE_PAGE_SIZE} per page</span>
+          </p>
+          {totalPages > 1 && <div className="ads-pager-nav">
+            <button type="button" className="ads-pager-btn" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)} aria-label="Previous page">‹</button>
+            {pageNumbers(currentPage, totalPages).map((item, index) => item === "gap"
+              ? <span className="ads-pager-gap" key={`gap-${index}`} aria-hidden="true">…</span>
+              : <button type="button" key={item} className={`ads-pager-btn${item === currentPage ? " active" : ""}`} aria-current={item === currentPage ? "page" : undefined} aria-label={`Page ${item}`} onClick={() => setPage(item)}>{item}</button>)}
+            <button type="button" className="ads-pager-btn" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)} aria-label="Next page">›</button>
+            <span className="ads-pager-total">Page {currentPage} of {totalPages}</span>
+          </div>}
+        </nav>}
       </div>
       {editing && <div className="ads-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setEditing(undefined); }}><form className="ads-admin-edit ads-admin-modal" role="dialog" aria-modal="true" onSubmit={(event) => {
         event.preventDefault();
@@ -236,7 +268,7 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
   );
 
   return (
-    <section className="ads-browser" aria-label="Video Ads browser">
+    <section className="ads-browser" aria-label="Video Library browser">
       <div className="ads-toolbar">
         <div className="ads-tabs" role="tablist" aria-label="Video type">
           {(["general", "branch"] as const).map((value) => (

@@ -18,5 +18,5 @@ async function ManageAdsContent() {
 }
 
 export default function ManageAdsPage() {
-  return <AdminOnly><main className="content-inner ads-page"><header className="ads-header"><h2>Manage Ads</h2><p>Edit or hide videos without changing files in Google Drive.</p></header><Suspense fallback={<div className="ads-loading">Loading videos…</div>}><ManageAdsContent /></Suspense></main></AdminOnly>;
+  return <AdminOnly><main className="content-inner ads-page"><header className="ads-header"><h2>Manage Video Library</h2><p>Edit or hide videos without changing files in Google Drive.</p></header><Suspense fallback={<div className="ads-loading">Loading videos…</div>}><ManageAdsContent /></Suspense></main></AdminOnly>;
 }

@@ -22,7 +22,7 @@ async function AdsContent() {
       message.includes("Google Drive API has not been used");
     return (
       <div className="ads-error">
-        <strong>Video Ads is unavailable.</strong>
+        <strong>Video Library is unavailable.</strong>
         {apiDisabled ? (
           <p>
             Enable the Google Drive API in Google Cloud Console, wait a few
@@ -43,7 +43,7 @@ export default function AdsPage() {
     <main className="content-inner ads-page">
       <header className="ads-header">
         <div>
-          <p className="eyebrow">VIDEO ADS</p>
+          <p className="eyebrow">VIDEO LIBRARY</p>
           <h2>Find the right video, fast.</h2>
           <p>
             Browse reusable ads for every branch, or find videos made for a
