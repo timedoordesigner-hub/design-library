@@ -210,10 +210,12 @@ function isExcludedVideo(name: string) {
 }
 
 function videoFromFile(file: DriveFile, path: string[], inherited = "") {
-  const root = path.findIndex(branchRoot);
+  // Overseas Ads may sit at the top level or inside Branch Ads; its own folder is the root then (branch = country).
+  const overseasAt = path.findIndex((part) => /\boverseas\s+ads?\b/i.test(part));
+  const root = overseasAt >= 0 ? overseasAt : path.findIndex(branchRoot);
   const isBranch = root >= 0;
   const branch = isBranch ? (path[root + 1] ?? path[root]) : "";
-  const area = isBranch && /overseas/i.test(path[root]) ? "overseas" : "local";
+  const area = overseasAt >= 0 ? "overseas" : "local";
   return {
     id: file.id,
     name: file.name,
@@ -250,7 +252,7 @@ async function loadVideos(token: string, category?: AdVideo["category"]) {
   let processed = 0;
 
   while (queue.length && processed < 10_000) {
-    const currentBatch = queue.splice(0, 8);
+    const currentBatch = queue.splice(0, 16);
     const results = await Promise.all(
       currentBatch.map(async (current) => ({
         current,
@@ -292,12 +294,32 @@ async function loadVideos(token: string, category?: AdVideo["category"]) {
   return videos;
 }
 
+const FRESH_MS = 30 * 60_000;
+const inflight = new Map<string, Promise<AdVideo[]>>();
+
+function refresh(key: string, category?: AdVideo["category"]) {
+  let job = inflight.get(key);
+  if (!job) {
+    job = accessToken()
+      .then((token) => loadVideos(token, category))
+      .then((videos) => {
+        dataCache.set(key, { value: videos, expiresAt: Date.now() + FRESH_MS });
+        return videos;
+      })
+      .finally(() => inflight.delete(key));
+    inflight.set(key, job);
+  }
+  return job;
+}
+
 // category given: scan only that half of Drive (General or Branch+Overseas). Omitted: everything.
+// Stale data is returned instantly while a refresh runs in the background; concurrent callers share one scan.
 export async function getAdVideos(category?: AdVideo["category"]) {
   const key = category ?? "all";
   const hit = dataCache.get(key);
-  if (hit && hit.expiresAt > Date.now()) return hit.value;
-  const videos = await loadVideos(await accessToken(), category);
-  dataCache.set(key, { value: videos, expiresAt: Date.now() + 5 * 60_000 });
-  return videos;
+  if (hit) {
+    if (hit.expiresAt <= Date.now()) refresh(key, category).catch(() => undefined);
+    return hit.value;
+  }
+  return refresh(key, category);
 }

@@ -48,7 +48,7 @@ const pageNumbers = (current: number, total: number) => {
 };
 
 const VISIBLE_BRANCHES = 8;
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 12;
 
 const branchLabel = (name: string) => name.replace(/^\d+[\s._-]*/, "");
 const fileLabel = (name: string) => name.replace(/\.[^.]+$/, "");
@@ -97,12 +97,18 @@ export default function AdsGallery({ videos: initialVideos, manage = false }: Pr
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
   const [activeVideo, setActiveVideo] = useState<(AdVideo & { displayTitle?: string | null })>();
   const [page, setPage] = useState(1);
+  const allBranchVideos = useMemo(
+    () => displayedVideos.filter((video) => video.category === "branch"),
+    [displayedVideos],
+  );
+  const areaCount = useMemo(() => {
+    const count = { all: allBranchVideos.length, local: 0, overseas: 0 };
+    for (const video of allBranchVideos) count[video.area] += 1;
+    return count;
+  }, [allBranchVideos]);
   const branchVideos = useMemo(
-    () =>
-      displayedVideos.filter(
-        (video) => video.category === "branch" && video.area === area,
-      ),
-    [area, displayedVideos],
+    () => allBranchVideos.filter((video) => video.area === area),
+    [area, allBranchVideos],
   );
   const branches = useMemo(
     () =>
@@ -156,12 +162,6 @@ export default function AdsGallery({ videos: initialVideos, manage = false }: Pr
   }, [selectedFolders, query, scoped]);
   const pagedVideos = visible.slice(0, page * PAGE_SIZE);
   const hasMore = pagedVideos.length < visible.length;
-
-  const chooseArea = (value: AdVideo["area"]) => {
-    setArea(value);
-    setSelectedBranches([]);
-    setPage(1);
-  };
 
   const toggleBranch = (value: string) => {
     setPage(1);
@@ -302,7 +302,7 @@ export default function AdsGallery({ videos: initialVideos, manage = false }: Pr
               {value === "general" ? "General" : "Branch"}
               {(value === "general" || branchLoaded) && (
                 <span>
-                  {displayedVideos.filter((video) => video.category === value).length}
+                  {value === "branch" ? areaCount.all : displayedVideos.filter((video) => video.category === value).length}
                 </span>
               )}
             </button>
@@ -364,24 +364,17 @@ export default function AdsGallery({ videos: initialVideos, manage = false }: Pr
         {tab === "branch" && (
           <aside className="ads-filters" aria-label="Filter by location">
             <p className="ads-filter-title">Area</p>
-            <label className="ads-filter-option">
-              <input
-                type="radio"
-                name="ads-area"
-                checked={area === "local"}
-                onChange={() => chooseArea("local")}
-              />{" "}
-              <span>Branch</span>
-            </label>
-            <label className="ads-filter-option">
-              <input
-                type="radio"
-                name="ads-area"
-                checked={area === "overseas"}
-                onChange={() => chooseArea("overseas")}
-              />{" "}
-              <span>Overseas</span>
-            </label>
+            {([["local", "Branch"], ["overseas", "Overseas"]] as const).map(([value, label]) => (
+              <label key={value} className="ads-filter-option">
+                <input
+                  type="radio"
+                  name="ads-area"
+                  checked={area === value}
+                  onChange={() => { setArea(value); setSelectedBranches([]); setPage(1); }}
+                />{" "}
+                <span>{label}</span>
+              </label>
+            ))}
             <div className="ads-filter-divider" />
             <div className="ads-filter-heading">
               <p className="ads-filter-title">Location</p>

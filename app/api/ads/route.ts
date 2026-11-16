@@ -5,11 +5,14 @@ import { getAdVideos } from "@/lib/googleDrive";
 export async function GET(request: NextRequest) {
   const category = request.nextUrl.searchParams.get("category");
   try {
-    return Response.json({
-      videos: await getAdVideos(
-        category === "general" || category === "branch" ? category : undefined,
-      ),
-    });
+    return Response.json(
+      {
+        videos: await getAdVideos(
+          category === "general" || category === "branch" ? category : undefined,
+        ),
+      },
+      { headers: { "Cache-Control": "public, s-maxage=600, stale-while-revalidate=86400" } },
+    );
   } catch (error) {
     const message =
       error instanceof Error
