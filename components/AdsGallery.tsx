@@ -56,8 +56,20 @@ const folderLabel = (name: string) => branchLabel(name).replace(/^\[[^\]]+\]\s*/
 // Judul custom menang; selain itu nama file membedakan video dalam satu folder.
 const videoTitle = (video: { name: string; displayTitle?: string | null }) => video.displayTitle || fileLabel(video.name);
 
-export default function AdsGallery({ videos: driveVideos, manage = false }: Props) {
+export default function AdsGallery({ videos: initialVideos, manage = false }: Props) {
   const { isAdmin } = useAuth();
+  // Public page ships General only; Branch/Overseas load on first visit to the Branch tab. Manage ships everything.
+  const [branchLoaded, setBranchLoaded] = useState<AdVideo[] | null>(null);
+  const [branchStatus, setBranchStatus] = useState<"idle" | "loading" | "error">("idle");
+  const loadBranch = () => {
+    if (manage || branchStatus === "loading" || branchLoaded) return;
+    setBranchStatus("loading");
+    fetch("/api/ads?category=branch")
+      .then((response) => response.ok ? response.json() as Promise<{ videos: AdVideo[] }> : Promise.reject())
+      .then((data) => { setBranchLoaded(data.videos); setBranchStatus("idle"); })
+      .catch(() => setBranchStatus("error"));
+  };
+  const driveVideos = useMemo(() => branchLoaded ? [...initialVideos, ...branchLoaded] : initialVideos, [initialVideos, branchLoaded]);
   const [settings, setSettings] = useState<VideoSetting[] | null>(null);
   const [settingsError, setSettingsError] = useState("");
   const [editing, setEditing] = useState<AdVideo>();
@@ -278,17 +290,21 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
               role="tab"
               aria-selected={tab === value}
               className={tab === value ? "active" : ""}
+              onPointerEnter={value === "branch" ? loadBranch : undefined}
               onClick={() => {
                 setTab(value);
+                if (value === "branch") loadBranch();
                 setSelectedBranches([]);
                 setSelectedFolders([]);
                 setPage(1);
               }}
             >
               {value === "general" ? "General" : "Branch"}
-              <span>
-                {displayedVideos.filter((video) => video.category === value).length}
-              </span>
+              {(value === "general" || branchLoaded) && (
+                <span>
+                  {displayedVideos.filter((video) => video.category === value).length}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -401,7 +417,13 @@ export default function AdsGallery({ videos: driveVideos, manage = false }: Prop
           </aside>
         )}
         <div className="ads-results">
-          {visible.length ? (
+          {tab === "branch" && !branchLoaded ? (
+            <div className={branchStatus === "error" ? "ads-error" : "ads-loading"} role={branchStatus === "error" ? "alert" : "status"}>
+              {branchStatus === "error"
+                ? <>Branch videos could not be loaded. <button type="button" className="ads-filter-more" onClick={loadBranch}>Retry</button></>
+                : "Loading branch videos…"}
+            </div>
+          ) : visible.length ? (
             <div className="ads-grid">
               {pagedVideos.map((video) => (
                 <button

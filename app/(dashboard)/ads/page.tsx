@@ -10,7 +10,7 @@ async function AdsContent() {
 
   let result;
   try {
-    result = await getAdVideos();
+    result = await getAdVideos("general");
   } catch (error) {
     const cause =
       error instanceof Error && error.cause instanceof Error

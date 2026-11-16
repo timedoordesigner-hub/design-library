@@ -1,4 +1,5 @@
 import "server-only";
+import { folderDescription, overseasSubfolderDescription } from "./folderDescriptions";
 
 const ROOT_ID = process.env.GOOGLE_DRIVE_ADS_FOLDER_ID;
 const SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -51,7 +52,7 @@ export type AdVideo = {
 };
 
 let tokenCache: { value: string; expiresAt: number } | undefined;
-let dataCache: { value: AdVideo[]; expiresAt: number } | undefined;
+const dataCache = new Map<string, { value: AdVideo[]; expiresAt: number }>();
 
 function base64Url(value: ArrayBuffer | string) {
   const bytes =
@@ -164,6 +165,25 @@ async function listChildren(token: string, parent: string) {
   return files;
 }
 
+// Drive stores rich-text descriptions as HTML (<div><p>…</p></div>); show plain text.
+function plainText(value?: string) {
+  if (!value) return "";
+  return value
+    .replace(/<\s*(br|\/p|\/div|\/li)\s*\/?>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n\s*\n+/g, "\n")
+    // Folder notes like "Folder tanpa video terbaca." are wrong once a video exists in it.
+    .replace(/\s*(?:Folder tanpa video(?: terbaca)?|Isi 0 video)\.?/gi, "")
+    .trim();
+}
+
 function duration(value?: string) {
   return value ? Math.round(Number(value) / 1000) : 0;
 }
@@ -208,7 +228,10 @@ function videoFromFile(file: DriveFile, path: string[], inherited = "") {
       file.thumbnailLink ??
       `https://drive.google.com/thumbnail?id=${file.id}&sz=w1000`,
     // Video's own description wins; else nearest folder description.
-    description: file.description?.trim() || inherited,
+    description:
+      plainText(file.description) ||
+      inherited ||
+      (isBranch ? "" : folderDescription(path[0] ?? "")),
     createdTime: file.createdTime ?? "",
     duration: duration(file.videoMediaMetadata?.durationMillis),
     width: file.videoMediaMetadata?.width,
@@ -216,7 +239,7 @@ function videoFromFile(file: DriveFile, path: string[], inherited = "") {
   } satisfies AdVideo;
 }
 
-async function loadVideos(token: string) {
+async function loadVideos(token: string, category?: AdVideo["category"]) {
   if (!ROOT_ID)
     throw new Error(
       "Google Drive is not configured. Add GOOGLE_DRIVE_ADS_FOLDER_ID.",
@@ -238,11 +261,19 @@ async function loadVideos(token: string) {
     for (const { current, children } of results) {
       for (const file of children) {
         if (file.mimeType === "application/vnd.google-apps.folder") {
-          if (!isExcludedFolder(file.name)) {
+          // Top-level split: Branch/Overseas roots are "branch", everything else "general". Skip the other half's whole subtree.
+          const wrongHalf =
+            category && current.path.length === 0 && branchRoot(file.name) !== (category === "branch");
+          if (!wrongHalf && !isExcludedFolder(file.name)) {
             queue.push({
               id: file.id,
               path: [...current.path, file.name],
-              description: file.description?.trim() || current.description,
+              description:
+                plainText(file.description) ||
+                (current.path.some((part) => /overseas\s+ads?/i.test(part))
+                  ? overseasSubfolderDescription(file.name)
+                  : "") ||
+                current.description,
             });
           }
           continue;
@@ -261,9 +292,12 @@ async function loadVideos(token: string) {
   return videos;
 }
 
-export async function getAdVideos() {
-  if (dataCache && dataCache.expiresAt > Date.now()) return dataCache.value;
-  const videos = await loadVideos(await accessToken());
-  dataCache = { value: videos, expiresAt: Date.now() + 5 * 60_000 };
+// category given: scan only that half of Drive (General or Branch+Overseas). Omitted: everything.
+export async function getAdVideos(category?: AdVideo["category"]) {
+  const key = category ?? "all";
+  const hit = dataCache.get(key);
+  if (hit && hit.expiresAt > Date.now()) return hit.value;
+  const videos = await loadVideos(await accessToken(), category);
+  dataCache.set(key, { value: videos, expiresAt: Date.now() + 5 * 60_000 });
   return videos;
 }

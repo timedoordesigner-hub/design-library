@@ -1,8 +1,15 @@
+import type { NextRequest } from "next/server";
 import { getAdVideos } from "@/lib/googleDrive";
 
-export async function GET() {
+// ?category=general|branch loads only that half of Drive; omitted loads all.
+export async function GET(request: NextRequest) {
+  const category = request.nextUrl.searchParams.get("category");
   try {
-    return Response.json({ videos: await getAdVideos() });
+    return Response.json({
+      videos: await getAdVideos(
+        category === "general" || category === "branch" ? category : undefined,
+      ),
+    });
   } catch (error) {
     const message =
       error instanceof Error
