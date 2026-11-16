@@ -1,5 +1,9 @@
 /* ── Video Ads ── */
 
+.ads-page {
+  padding-top: 32px;
+}
+
 .ads-header {
   margin-bottom: 20px;
 }
