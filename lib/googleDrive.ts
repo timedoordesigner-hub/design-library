@@ -21,6 +21,7 @@ type DriveFile = {
     width?: number;
     height?: number;
   };
+  imageMediaMetadata?: { width?: number; height?: number };
 };
 
 type DriveListResponse = { files?: DriveFile[]; nextPageToken?: string };
@@ -134,14 +135,14 @@ async function accessToken() {
   return data.access_token;
 }
 
-async function listChildren(token: string, parent: string) {
+async function listChildren(token: string, parent: string, extraFields = "videoMediaMetadata") {
   const files: DriveFile[] = [];
   let pageToken = "";
   do {
     const params = new URLSearchParams({
       q: `'${parent}' in parents and trashed = false`,
       fields:
-        "nextPageToken,files(id,name,mimeType,webViewLink,thumbnailLink,description,createdTime,videoMediaMetadata)",
+        `nextPageToken,files(id,name,mimeType,webViewLink,thumbnailLink,description,createdTime,${extraFields})`,
       pageSize: "1000",
       orderBy: "name_natural",
       supportsAllDrives: "true",
@@ -322,4 +323,63 @@ export async function getAdVideos(category?: AdVideo["category"]) {
     return hit.value;
   }
   return refresh(key, category);
+}
+
+export type StaticAd = {
+  id: string;
+  name: string;
+  folder: string;
+  url: string;
+  thumbnail: string;
+  createdTime: string;
+  width: number;
+  height: number;
+};
+
+// Static image ads folder (override with GOOGLE_DRIVE_STATIC_ADS_FOLDER_ID).
+const STATIC_ID =
+  process.env.GOOGLE_DRIVE_STATIC_ADS_FOLDER_ID ?? "1ceoPP-nwE1iFTNsSDT9gy28BZfPDGFJj";
+let staticCache: { value: StaticAd[]; expiresAt: number } | undefined;
+let staticJob: Promise<StaticAd[]> | undefined;
+
+async function loadStaticAds() {
+  const token = await accessToken();
+  const ads: StaticAd[] = [];
+  // ponytail: depth-first, sequential; fine for a few dozen folders. Batch like loadVideos if it grows.
+  const walk = async (parent: string, path: string[]) => {
+    for (const file of await listChildren(token, parent, "imageMediaMetadata(width,height)")) {
+      if (file.mimeType === "application/vnd.google-apps.folder") {
+        await walk(file.id, [...path, file.name]);
+      } else if (file.mimeType.startsWith("image/")) {
+        ads.push({
+          id: file.id,
+          name: file.name,
+          folder: path.join(" / "),
+          url: file.webViewLink ?? `https://drive.google.com/file/d/${file.id}/view`,
+          thumbnail: file.thumbnailLink?.replace(/=s\d+$/, "=w700") ?? `https://drive.google.com/thumbnail?id=${file.id}&sz=w700`,
+          createdTime: file.createdTime ?? "",
+          width: file.imageMediaMetadata?.width ?? 0,
+          height: file.imageMediaMetadata?.height ?? 0,
+        });
+      }
+    }
+  };
+  await walk(STATIC_ID, []);
+  return ads.sort((a, b) => b.createdTime.localeCompare(a.createdTime));
+}
+
+// Stale-while-revalidate, same as getAdVideos.
+export async function getStaticAds() {
+  const refreshAds = () =>
+    (staticJob ??= loadStaticAds()
+      .then((value) => {
+        staticCache = { value, expiresAt: Date.now() + FRESH_MS };
+        return value;
+      })
+      .finally(() => (staticJob = undefined)));
+  if (staticCache) {
+    if (staticCache.expiresAt <= Date.now()) refreshAds().catch(() => undefined);
+    return staticCache.value;
+  }
+  return refreshAds();
 }

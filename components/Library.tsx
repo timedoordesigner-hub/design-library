@@ -13,6 +13,7 @@ import { useToast } from "./Toast";
 import { apply, parseQuery, toParams, type Query, type SortKey } from "@/lib/query";
 import { Thumb } from "./Thumb";
 import { Viewer } from "./Viewer";
+import { Pager } from "./Pager";
 import { useAuth } from "./AuthProvider";
 
 type OpenHandler = (design: Design, element: HTMLElement) => void;
@@ -29,15 +30,26 @@ export function Library() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Design | null>(null);
   const lastFocusRef = useRef<HTMLElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const { categories, tipes } = useMemo(() => deriveOptions(designs), [designs]);
 
   const results = useMemo(() => apply(designs, query), [designs, query]);
+  const pageStart = (Math.min(page, Math.max(1, Math.ceil(results.length / pageSize))) - 1) * pageSize;
+  const pageItems = results.slice(pageStart, pageStart + pageSize);
+  const goToPage = (next: number) => {
+    setPage(next);
+    listRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  };
   const activeDesign = query.id ? designs.find((design) => design.id === query.id) : null;
   const viewerDesigns = activeDesign && !results.some((design) => design.id === activeDesign.id) ? [...results, activeDesign] : results;
   const filterCount = query.cat.length + query.tipe.length;
   const hasFilters = filterCount > 0;
 
   const update = useCallback((changes: Partial<Query>) => {
+    // Opening/closing the viewer keeps the page; any search/filter/sort change goes back to page 1.
+    if (!("id" in changes)) setPage(1);
     const next = { ...query, ...changes };
     const qs = toParams(next).toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
@@ -119,7 +131,7 @@ export function Library() {
           </div>
         )}
 
-        <div className="mt-4">
+        <div className="mt-4" ref={listRef} style={{ scrollMarginTop: 16 }}>
           {loading ? (
             <div className="skeleton h-72" aria-label="Loading data" />
           ) : designs.length === 0 ? (
@@ -134,10 +146,11 @@ export function Library() {
               <p className="mt-1 text-[13px] text-muted">Try another keyword or clear the filters.</p>
             </div>
           ) : query.view === "grid" ? (
-            <CardGrid items={results} onOpen={openDesign} onDelete={isAdmin ? setPendingDelete : undefined} />
+            <CardGrid items={pageItems} onOpen={openDesign} onDelete={isAdmin ? setPendingDelete : undefined} />
           ) : (
-            <Table items={results} onOpen={openDesign} onDelete={isAdmin ? setPendingDelete : undefined} />
+            <Table items={pageItems} onOpen={openDesign} onDelete={isAdmin ? setPendingDelete : undefined} />
           )}
+          {!loading && <Pager page={page} pageSize={pageSize} total={results.length} noun="files" onPage={goToPage} onPageSize={(size) => { setPageSize(size); setPage(1); }} />}
         </div>
       </div>
       {activeDesign && <Viewer designs={viewerDesigns} activeId={activeDesign.id} onClose={closeViewer} onNavigate={navigateViewer} onDelete={isAdmin ? setPendingDelete : undefined} />}

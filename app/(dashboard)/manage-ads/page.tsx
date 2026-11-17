@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { connection } from "next/server";
 import { AdminOnly } from "@/components/AdminOnly";
 import AdsGallery from "@/components/AdsGallery";
@@ -18,5 +19,5 @@ async function ManageAdsContent() {
 }
 
 export default function ManageAdsPage() {
-  return <AdminOnly><main className="content-inner ads-page"><header className="ads-header"><h2>Manage Video Library</h2><p>Edit or hide videos without changing files in Google Drive.</p></header><Suspense fallback={<div className="ads-loading">Loading videos…</div>}><ManageAdsContent /></Suspense></main></AdminOnly>;
+  return <AdminOnly><main className="content-inner ads-page"><header className="ads-header"><Link href="/manage" className="manage-back">← Manage</Link><h2>Manage Video Library</h2><p>Edit or hide videos without changing files in Google Drive.</p></header><Suspense fallback={<div className="ads-loading">Loading videos…</div>}><ManageAdsContent /></Suspense></main></AdminOnly>;
 }

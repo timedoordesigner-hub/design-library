@@ -94,3 +94,23 @@ create policy "previews_admin_update" on storage.objects
 drop policy if exists "previews_admin_delete" on storage.objects;
 create policy "previews_admin_delete" on storage.objects
   for delete to authenticated using (bucket_id = 'design-previews' and public.is_admin());
+
+-- Static image ads: judul, deskripsi, link Figma, hidden. File asli tetap di Google Drive.
+create table if not exists public.static_ad_settings (
+  ad_id text primary key,
+  title text check (title is null or length(title) <= 300),
+  description text check (description is null or length(description) <= 2000),
+  figma_url text check (figma_url is null or (figma_url ~ '^https://' and length(figma_url) <= 2000)),
+  hidden boolean not null default false
+);
+alter table public.static_ad_settings enable row level security;
+grant select on public.static_ad_settings to anon, authenticated;
+grant insert, update, delete on public.static_ad_settings to authenticated;
+drop policy if exists "static_ads_read" on public.static_ad_settings;
+create policy "static_ads_read" on public.static_ad_settings for select to anon, authenticated using (true);
+drop policy if exists "static_ads_admin_insert" on public.static_ad_settings;
+create policy "static_ads_admin_insert" on public.static_ad_settings for insert to authenticated with check (public.is_admin());
+drop policy if exists "static_ads_admin_update" on public.static_ad_settings;
+create policy "static_ads_admin_update" on public.static_ad_settings for update to authenticated using (public.is_admin()) with check (public.is_admin());
+drop policy if exists "static_ads_admin_delete" on public.static_ad_settings;
+create policy "static_ads_admin_delete" on public.static_ad_settings for delete to authenticated using (public.is_admin());
